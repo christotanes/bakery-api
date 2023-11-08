@@ -99,46 +99,31 @@ export async function getProductById(req, res){
   }
 }
 
-// [SECTION - ADMIN] Update Product << Need to REFACTOR
-export async function updateProduct(req,res){
-  const { name, description, type, size, quantity, price, allergens, weight, deliveryAvailable, flavors, bestBefore, vegetarian, featured} = req.body;
-  const productId = req.body.id;
+// [SECTION - ADMIN] Update Product
+// NEED TO TEST THIS
+export async function updateProduct(req, res) {
+  const { id, ...updates } = req.body;
 
-  try{
-      const productToUpdate = await Product.findById(productId)
+  try {
+    const productToUpdate = await Product.findByIdAndUpdate(id, updates, { new: true });
 
-      if (!productToUpdate) {
-        return res.status(404).json({
-          error: 'Not found',
-          message: 'There is no product with that information'
-        });
-      };
+    if (!productToUpdate) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'There is no product with that information'
+      });
+    };
 
-      productToUpdate.name = name || productToUpdate.name;
-      productToUpdate.description = description || productToUpdate.description;
-      productToUpdate.type = type || productToUpdate.type;
-      productToUpdate.size = size || productToUpdate.size;
-      productToUpdate.quantity = quantity || productToUpdate.quantity;
-      productToUpdate.price = price || productToUpdate.price;
-      productToUpdate.allergens = allergens || productToUpdate.allergens;
-      productToUpdate.weight = weight || productToUpdate.weight;
-      productToUpdate.deliveryAvailable = deliveryAvailable || productToUpdate.deliveryAvailable;
-      productToUpdate.flavors = flavors || productToUpdate.flavors;
-      productToUpdate.bestBefore = bestBefore || productToUpdate.bestBefore;
-      productToUpdate.vegetarian = vegetarian || productToUpdate.vegetarian;
-      productToUpdate.featured = featured || productToUpdate.featured;
-
-      await productToUpdate.save()
-
-      return res.status(200).json({
-        message: 'Product is successfully updated!',
-        product: productToUpdate
+    return res.status(200).json({
+      message: 'Product is successfully updated!',
+      product: productToUpdate
     });
-  } catch(error) {
+  } catch (error) {
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
-  }
+  };
 }
+
 
 // [SECTION - ADMIN] Archive Product
 export async function archiveProduct(req,res){
