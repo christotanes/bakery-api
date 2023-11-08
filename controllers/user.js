@@ -1,0 +1,74 @@
+console.log("Hello world from controller.js");
+import bcrypt from 'bcrypt';
+import express from 'express';
+// import cheerio from 'cheerio';
+// import axios from 'axios';
+import User from '../models/User.js';
+import { createAccessToken } from '../auth.js';
+
+// [SECTION] Admin GETS all users
+export async function getAllUsers (req, res){
+    try{
+        const allUsers = await User.find();
+        if(allUsers == null){
+            return ('No users registered')
+        }
+
+        return res.status(200).send(allUsers);   
+
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+// [SECTION] Register New User
+export async function registerUser(req, res){
+    console.log(req.body)
+    try {
+        const emailExists = await User.findOne({ email: req.body.email });
+        if (emailExists) {
+          return res.send('Email has already been used or registered.');
+        } else {
+          const newUser = new User({
+            email: req.body.email,
+            password: bcrypt.hashSync(req.body.password, 10),
+          });
+    
+          return newUser.save().then((result, error) => {
+            if (error) {
+              return res.send(error);
+            } else {
+              return res.status(201).send('User was successfully registered!');
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+      }
+    }
+
+// [SECTION] User Logins
+export async function login(req, res){
+    try{
+        const user = await User.findOne({ email: req.body.email});
+        // console.log(user)
+        if(user == null){
+            return res.status(404).json({error: 'There is no account registered under this email'});
+        } else {
+            const isPasswordCorrect = bcrypt.compareSync(req.body.password, user.password);
+
+            if(isPasswordCorrect){
+                return res.status(201).send({ access: createAccessToken(user) });
+            } else {
+                return res.status(401).json({ error: 'Unauthorized - Incorrect password'});
+            }
+        }
+    } catch (error) {
+        console.log("Error:", error);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
+export default getAllUsers;

@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+};
+
+/* Animation Utility settings */
+/* .animate {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+}
+
+.animate-infinite {
+    animation-iteration-count: infinite;
+}
+
+.animate-delay-1 {
+    animation-delay: 1s;
+}
+
+.animate-fast {
+    animation-duration: 0.3s;
+}
+
+.animate-slow {
+    animation-duration: 3s;
+}
+
+@keyframes slideFromLeft {
+    from {
+        transform: translateX(-300px);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.slideFromLeft {
+    animation-name: slideFromLeft;
+    animation-timing-function: ease-in;
+} */
+
+/* transition-property: transform;
+transition-duration: 0.3s;
+transition-timing-function: ease;
+transition-delay: 0s;
+
+transition: transform 0.3s ease 0; In order from top to bottom, left to right*/
+
+/* .btn:hover {
+    transform: translateY(-10px);
+    background-color: aliceblue; change if needed
+    color: blue; change if needed
+} */

@@ -1,0 +1,76 @@
+Capstone Min Reqs
+    User Registration FIRST
+    User authentication
+    Create Product (Admin Only)
+    Retrieve all products
+    Retrieve all active products
+    Retrieve single product
+    Update Product info (Admin Only)
+    Archive Product (Admin only)
+    Activate Product (Admin only)
+    Non-admin User checkout (Create Order)
+    Retrieve User Details
+
+Stretch Goals
+    Set user as admin (Admin only)
+    Retrieve authenticated user's orders
+    Retrieve all orders (Admin only)
+    Add to cart
+        - Added Products
+        - Change product quantities
+        - Remove products from cart
+        - Subtotal for each item
+        - Total price for all items
+
+Bakery Project
+> Start FE of capstone
+> What BE needs
+    > DB of products
+        > Cake
+            > cakeId
+            > price
+            > design
+            > size
+            > description
+            > isMadeToOrder
+            > isAvailable
+
+        > Breads
+            > breadId
+            > price
+            > quantity
+            > type
+            > description
+            > isAvailable
+    > User
+        > id
+        > email
+        > Password
+        > mobile
+        > name
+        > address
+        > payment info
+        > isAdmin
+        > Reset password
+    > Order info
+        > Order info
+        > id
+        > product id
+        > User id
+        > quantity
+        > date requested tobeMade if cake
+        > address for deliver
+        > locationRequested for cake pickup
+        > amount
+        > payment info
+        > status pending, completed
+    > Routes
+        > / main page get all available products
+        > /cakes get all cakes
+        > /breads get all breads
+        > /register post user
+        > /login post login 
+        > /user/:id get users info
+        > /user/order/:orderid get, patch, put, delete
+        > /admin/order/:orderid get, patch, put, delete
+        > /admin/ if admin post, patch, put, delete car
