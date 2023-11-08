@@ -17,8 +17,8 @@ export async function getAllUsers (req, res){
         return res.status(200).send(allUsers);   
 
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Internal Server Error');
+        console.log(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
     }
 }
 
@@ -74,7 +74,7 @@ export async function registerUser(req, res) {
         });
       }
   
-      console.error('Error during user save:', saveError);
+      console.error(`Error during user save: ${saveError}`);
       return res.status(500).send('Internal Server Error');
     }
   }
@@ -97,7 +97,7 @@ export async function login(req, res){
             }
         }
     } catch (error) {
-        console.log("Error:", error);
+        console.log(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
     }
 }

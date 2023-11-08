@@ -20,8 +20,8 @@ export async function getAllProducts(req, res) {
 
     return res.status(200).json(allProducts);
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).send('Internal Server Error');
+    console.log(`Error: ${error}`);
+    return res.status(500).send('Internal Server Error');
   }
 }
 
@@ -53,12 +53,29 @@ export async function createProduct (req, res){
             });
         }
       } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Internal Server Error');
+        console.log(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
       }
     }
 
-// [SECTION]
+// [SECTION] Retrieve all ACTIVE products
+export async function activeProducts(req, res){
+  try{
+    const activeProducts = await Product.find({ isActive: true});
+
+    if(!activeProducts.length){
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'There are no products available as of this moment.'
+      });
+    } else return res.status(200).json(activeProducts);
+  } catch (error) {
+      console.log(`Error: ${error}`);
+      return res.status(500).send('Internal Server Error');
+  }
+}
+
+
 export default getAllProducts;
 
 // // [SECTION] Dependencies & Modules
