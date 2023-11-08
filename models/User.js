@@ -11,32 +11,38 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Email is Required']
+    required: [true, 'Email is Required'],
+    unique: true,
+    lowercase: true,
+    trim: true,
+    match: [/\S+@\S+\.\S+/, 'Please enter a valid email address']
   },
   password: {
     type: String,
-    required: [true, 'Password is Required']
+    required: [true, 'Password is Required'],
+    minlength: [8, 'Password must be at least 8 characters']
   },
   mobileNo: {
-    type: Number
+    type: String
   },
   address: {
     houseNo: {
-      type: Number
+      type: String
     },
     streetName: {
       type: String
     },
     city: {
       type: String
-    }
+    },
   },
   isAdmin: {
     type: Boolean,
-    default: false,
+    default: false
   },
   orderedProduct: [
-    { products: [
+    {
+      products: [
         {
           productId: {
             type: String,
@@ -49,30 +55,32 @@ const userSchema = new mongoose.Schema({
           quantity: {
             type: Number,
             required: [true, 'Quantity bought is Required']
-          }
-        }
+          },
+        },
       ],
-        paymentInfo: {
-          type: [{
+      paymentInfo: {
+        type: [
+          {
             type: String,
             enum: ['Cash on Delivery', 'Visa', 'Mastercard', 'Gcash']
-          }],
-          default: ['Cash on Delivery']
-        },
-        totalAmount: {
-          type: Number,
-          required: [true, 'Total Amount is Required']
-        },
-        purchasedOn: {
-          type: Date,
-          default: new Date()
-        }
-      }
-    ],
-    createdOn: {
-      type: Date,
-      default: new Date()
-    }
-  });
+          },
+        ],
+        default: [],
+      },
+      totalAmount: {
+        type: Number,
+        required: [true, 'Total Amount is Required']
+      },
+      purchasedOn: {
+        type: Date,
+        default: new Date()
+      },
+    },
+  ],
+  createdOn: {
+    type: Date,
+    default: new Date()
+  },
+});
   
-  export default mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);

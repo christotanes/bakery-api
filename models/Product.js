@@ -31,10 +31,10 @@ const productSchema = new mongoose.Schema({
   },
   allergens: {
     type: [String],
-    default: [],
+    default: []
   },
   weight: {
-    type: String,
+    type: String
   },
   deliveryAvailable: {
     type: Boolean,
@@ -42,18 +42,18 @@ const productSchema = new mongoose.Schema({
   },
   flavors: {
     type: [String],
-    default: [],
+    default: []
   },
   bestBefore: {
-    type: String,
+    type: String
   },
   vegetarian: {
     type: Boolean,
-    default: false,
+    default: false
   },
   featured: {
     type: Boolean,
-    default: false,
+    default: false
   },
   isActive: {
     type: Boolean,
