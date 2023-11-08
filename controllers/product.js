@@ -14,7 +14,7 @@ export async function getAllProducts(req, res) {
     if (!allProducts.length) {
       return res.status(404).json({
         error: 'Not Found',
-        message: 'No products found',
+        message: 'No products found'
       });
     }
 
@@ -33,7 +33,7 @@ export async function createProduct (req, res){
         if (productExists) {
             return res.status(409).json({
               error: 'Conflict',
-              message: 'Product Name has already been used or registered.',
+              message: 'Product Name has already been used or registered.'
             });
           } else {
             const newProduct = new Product({
@@ -49,7 +49,7 @@ export async function createProduct (req, res){
 
             return res.status(201).json({
                 message: 'Product was successfully created!',
-                product: savedProduct,
+                product: savedProduct
             });
         }
       } catch (error) {
@@ -110,7 +110,7 @@ export async function updateProduct(req,res){
       if (!productToUpdate) {
         return res.status(404).json({
           error: 'Not found',
-          message: 'There is no product of that information'
+          message: 'There is no product with that information'
         });
       };
 
@@ -129,10 +129,10 @@ export async function updateProduct(req,res){
       productToUpdate.featured = featured || productToUpdate.featured;
 
       await productToUpdate.save()
-      
+
       return res.status(200).json({
         message: 'Product was successfully updated!',
-        product: productToUpdate,
+        product: productToUpdate
     });
   } catch(error) {
     console.log(`Error: ${error}`);
@@ -140,6 +140,33 @@ export async function updateProduct(req,res){
   }
 }
 
+// [SECTION - ADMIN] Archive Product
+export async function archiveProduct(req,res){
+  try {
+    const archiveProduct = await Product.findById(req.body.id)
+
+    if(!archiveProduct){
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'There is no product with that information'
+      })
+    } else if (archiveProduct.isActive == false){
+      return res.status(409).json({
+        error: 'Conflict',
+        message: 'Product is already archived'
+      });
+    }
+    archiveProduct.isActive = false
+    await archiveProduct.save()
+    return res.status(200).json({
+      message: 'Product was successfully archived!',
+      product: archiveProduct
+    });
+  } catch (error){
+    console.log(`Error: ${error}`);
+    return res.status(500).send('Internal Server Error');
+  }
+}
 
 export default getAllProducts;
 
