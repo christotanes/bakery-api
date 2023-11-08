@@ -48,7 +48,7 @@ export async function createProduct (req, res){
             const savedProduct = await newProduct.save();
 
             return res.status(201).json({
-                message: 'Product was successfully created!',
+                message: 'Product is successfully created!',
                 product: savedProduct
             });
         }
@@ -99,7 +99,7 @@ export async function getProductById(req, res){
   }
 }
 
-// [SECTION - ADMIN] Update Product
+// [SECTION - ADMIN] Update Product << Need to REFACTOR
 export async function updateProduct(req,res){
   const { name, description, type, size, quantity, price, allergens, weight, deliveryAvailable, flavors, bestBefore, vegetarian, featured} = req.body;
   const productId = req.body.id;
@@ -131,7 +131,7 @@ export async function updateProduct(req,res){
       await productToUpdate.save()
 
       return res.status(200).json({
-        message: 'Product was successfully updated!',
+        message: 'Product is successfully updated!',
         product: productToUpdate
     });
   } catch(error) {
@@ -143,29 +143,58 @@ export async function updateProduct(req,res){
 // [SECTION - ADMIN] Archive Product
 export async function archiveProduct(req,res){
   try {
-    const archiveProduct = await Product.findById(req.body.id)
+    const productToArchive = await Product.findById(req.body.id)
 
-    if(!archiveProduct){
+    if(!productToArchive){
       return res.status(404).json({
         error: 'Not found',
         message: 'There is no product with that information'
       })
-    } else if (archiveProduct.isActive == false){
+    } else if (productToArchive.isActive == false){
       return res.status(409).json({
         error: 'Conflict',
         message: 'Product is already archived'
       });
     }
-    archiveProduct.isActive = false
-    await archiveProduct.save()
+    productToArchive.isActive = false
+    await productToArchive.save()
     return res.status(200).json({
-      message: 'Product was successfully archived!',
-      product: archiveProduct
+      message: 'Product is successfully archived!',
+      product: productToArchive
     });
   } catch (error){
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
   }
+}
+
+// [SECTION - ADMIN] Activate Product
+export async function activateProduct(req,res){
+  try {
+      const productToActivate = await Product.findById(req.body.id)
+
+      if (!productToActivate) {
+        return res.status(404).json({
+          error: 'Not found',
+          message: 'There is no product with that information'
+        });
+      } else if(productToActivate.isActive == true){
+        return res.status(409).json({
+          error: 'Conflict',
+          message: 'Product is already activated'
+        });
+      };
+
+      productToActivate.isActive = true;
+      await productToActivate.save();
+      return res.status(200).json({
+        message: 'Product is successfully activated!',
+        product: productToActivate
+      })
+  } catch (error) {
+    console.error(`Error: ${error}`);
+    return res.status(500).send('Internal Serve Error');
+  };
 }
 
 export default getAllProducts;

@@ -1,6 +1,6 @@
 console.log("Hello world from routes/product.js");
 import express from 'express';
-import { getAllProducts, createProduct, activeProducts, getProductById, updateProduct, archiveProduct } from '../controllers/product.js';
+import { getAllProducts, createProduct, activeProducts, getProductById, updateProduct, archiveProduct, activateProduct } from '../controllers/product.js';
 import { verify, verifyAdmin } from '../auth.js';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get('/active', activeProducts);
 router.get('/:id', getProductById);
 router.put('/update', verify, verifyAdmin, updateProduct);
 router.patch('/archive', verify, verifyAdmin, archiveProduct);
+router.patch('/activate', verify, verifyAdmin, activateProduct);
 
 export default router
 
