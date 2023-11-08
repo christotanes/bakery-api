@@ -1,4 +1,4 @@
-console.log("Hello world from routes.js");
+console.log("Hello world from routes/product.js");
 import express from 'express';
 import { getAllProducts, createProduct } from '../controllers/product.js';
 import { verify, verifyAdmin } from '../auth.js';

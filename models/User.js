@@ -1,4 +1,4 @@
-console.log("Hello world from model.js");
+console.log("Hello world from models/User.js");
 import { mongoose } from "mongoose";
 
 // JSON schema for (placeholder = TaskSchema)

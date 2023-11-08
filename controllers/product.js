@@ -1,4 +1,4 @@
-console.log("Hello world from controller.js");
+console.log("Hello world from controllers/product.js");
 import express from 'express';
 import Product from '../models/Product.js';
 // import bcrypt from 'bcrypt';

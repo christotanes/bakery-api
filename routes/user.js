@@ -1,4 +1,4 @@
-console.log("Hello world from routes.js");
+console.log("Hello world from routes/user.js");
 import express from 'express';
 import getAllUsers from '../controllers/user.js';
 import { registerUser, login } from '../controllers/user.js';
