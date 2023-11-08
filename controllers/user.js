@@ -23,33 +23,62 @@ export async function getAllUsers (req, res){
 }
 
 // [SECTION] Register New User
-export async function registerUser(req, res){
-    console.log(req.body)
-    try {
-        const emailExists = await User.findOne({ email: req.body.email });
-        if (emailExists) {
-                return res.status(409).json({
-                    error: 'Conflict',
-                    message: 'Email has already been used or registered.'
-                })
-            } else {
-                const newUser = new User({
-                    email: req.body.email,
-                    password: bcrypt.hashSync(req.body.password, 10),
-                });
+// export async function registerUser(req, res){
+//     console.log(req.body)
+//     try {
+//         const emailExists = await User.findOne({ email: req.body.email });
+//         if (emailExists) {
+//                 return res.status(409).json({
+//                     error: 'Conflict',
+//                     message: 'Email has already been used or registered.'
+//                 })
+//             } else {
+//                 const newUser = new User({
+//                     email: req.body.email,
+//                     password: bcrypt.hashSync(req.body.password, 10),
+//                 });
             
-                const savedUser = await newUser.save();
+//                 const savedUser = await newUser.save();
 
-                return res.status(201).json({
-                  message: 'User was successfully registered!',
-                  product: savedUser,
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            res.status(500).send('Internal Server Error');
-        }
+//                 return res.status(201).json({
+//                   message: 'User was successfully registered!',
+//                   product: savedUser,
+//                 });
+//             }
+//         } catch (error) {
+//             console.error('Error:', error);
+//             res.status(500).send('Internal Server Error');
+//         }
+//     }
+export async function registerUser(req, res) {
+    console.log(req.body);
+  
+    const newUser = new User({
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, 10),
+    });
+  
+    try {
+      const savedUser = await newUser.save();
+  
+      return res.status(201).json({
+        message: 'User was successfully registered!',
+        product: savedUser,
+      });
+    } catch (saveError) {
+      if (saveError.name === 'MongoError' && saveError.code === 11000) {
+        // Unique constraint violation (duplicate email)
+        return res.status(409).json({
+          error: 'Conflict',
+          message: 'Email has already been used or registered.',
+        });
+      }
+  
+      console.error('Error during user save:', saveError);
+      return res.status(500).send('Internal Server Error');
     }
+  }
+
 
 // [SECTION] User Logins
 export async function login(req, res){

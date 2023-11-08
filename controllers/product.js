@@ -7,22 +7,23 @@ import Product from '../models/Product.js';
 // import auth from '../auth.js';
 
 // [SECTION] Get All Products
-export async function getAllProducts (req, res){
-    try{
-        if (allProducts.length === 0) {
-            return res.status(404).json({
-              error: 'Not Found',
-              message: 'No products found',
-            });
-          }
-      
-        return res.status(200).send(allProducts);
+export async function getAllProducts(req, res) {
+  try {
+    const allProducts = await Product.find({});
 
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Internal Server Error');
-    };
-};
+    if (!allProducts.length) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: 'No products found',
+      });
+    }
+
+    return res.status(200).json(allProducts);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+}
 
 // [SECTION - ADMIN] Create Product
 export async function createProduct (req, res){
@@ -57,6 +58,7 @@ export async function createProduct (req, res){
       }
     }
 
+// [SECTION]
 export default getAllProducts;
 
 // // [SECTION] Dependencies & Modules

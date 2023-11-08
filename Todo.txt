@@ -1,7 +1,7 @@
 Capstone Min Reqs
-    User Registration FIRST
-    User authentication
-    Create Product (Admin Only)
+    >>> User Registration FIRST
+    >>> User authentication
+    >>> Create Product (Admin Only)
     Retrieve all products
     Retrieve all active products
     Retrieve single product

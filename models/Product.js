@@ -13,11 +13,13 @@ const productSchema = new mongoose.Schema({
   },
   type: {
     type: String,
+    lowercase: true,
     enum: ['cake', 'bread'],
     required: [true, 'Type of Product is Required']
   },
   size: {
     type: String,
+    lowercase: true,
     enum: ['regular', 'medium', 'large'],
     required: [true, 'Size of Product is Reguired']
   },
