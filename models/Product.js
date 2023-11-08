@@ -12,23 +12,48 @@ const productSchema = new mongoose.Schema({
     required: [true, 'Description of product is Required']
   },
   type: {
-    type: [{
-      type: String,
-      enum: ['Cake', 'Bread']
-    }],
-    default: ['Cake']
+    type: String,
+    enum: ['cake', 'bread'],
+    required: [true, 'Type of Product is Required']
+  },
+  size: {
+    type: String,
+    enum: ['regular', 'medium', 'large'],
+    required: [true, 'Size of Product is Reguired']
+  },
+  quantity: {
+    type: Number,
+    required: [true, 'Quantity of Product is Required']
   },
   price: {
     type: Number,
     required: [true, 'Price of Product is Required']
   },
-  size: {
-    type: String,
-    required: [true, 'Size of Product is Required']
+  allergens: {
+    type: [String],
+    default: [],
   },
-  quantity: {
-    type: Number,
-    required: [true, 'Quantity of Product is Required']
+  weight: {
+    type: String,
+  },
+  deliveryAvailable: {
+    type: Boolean,
+    default: false,
+  },
+  flavors: {
+    type: [String],
+    default: [],
+  },
+  bestBefore: {
+    type: String,
+  },
+  vegetarian: {
+    type: Boolean,
+    default: false,
+  },
+  featured: {
+    type: Boolean,
+    default: false,
   },
   isActive: {
     type: Boolean,

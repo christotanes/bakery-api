@@ -1,11 +1,12 @@
 console.log("Hello world from routes.js");
 import express from 'express';
-// import functionName from '../controller/controller.js';
-// import { anotherFunction } from '../controller/controller.js';
+import { getAllProducts, createProduct } from '../controllers/product.js';
+import { verify, verifyAdmin } from '../auth.js';
 
 const router = express.Router();
 
-router.get("/", functionName);
+router.get("/", getAllProducts)
+router.post("/createProduct", verify, verifyAdmin, createProduct);
 
 export default router
 

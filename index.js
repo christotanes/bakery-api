@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 // import axios from 'axios';
 import cors from 'cors';
-// import productRoute from './routes/product';
+import productRoute from './routes/product.js';
 import userRoute from './routes/user.js';
 
 const app = express();
@@ -16,11 +16,12 @@ db.on("error", console.error.bind(console, "Connection error"));
 db.on("open", () => console.log("Now connected to Bakery MongoDB"));
 
 app.use(express.urlencoded({extended: true}));
-app.use(express.static('public'))
+app.use(express.static('public'));
 app.use(express.json());
 
 // app.use('/', productRoute);
-app.use('/users', userRoute)
+app.use('/users', userRoute);
+app.use('/products', productRoute);
 
 // Listen to the port
 

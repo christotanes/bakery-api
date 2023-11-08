@@ -1,10 +1,10 @@
 console.log("Hello world from controller.js");
-import bcrypt from 'bcrypt';
 import express from 'express';
-// import cheerio from 'cheerio';
-// import axios from 'axios';
+import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import { createAccessToken } from '../auth.js';
+// import cheerio from 'cheerio';
+// import axios from 'axios';
 
 // [SECTION] Admin GETS all users
 export async function getAllUsers (req, res){
@@ -28,25 +28,27 @@ export async function registerUser(req, res){
     try {
         const emailExists = await User.findOne({ email: req.body.email });
         if (emailExists) {
-          return res.send('Email has already been used or registered.');
-        } else {
-          const newUser = new User({
-            email: req.body.email,
-            password: bcrypt.hashSync(req.body.password, 10),
-          });
-    
-          return newUser.save().then((result, error) => {
-            if (error) {
-              return res.send(error);
+                return res.status(409).json({
+                    error: 'Conflict',
+                    message: 'Email has already been used or registered.'
+                })
             } else {
-              return res.status(201).send('User was successfully registered!');
+                const newUser = new User({
+                    email: req.body.email,
+                    password: bcrypt.hashSync(req.body.password, 10),
+                });
+            
+                const savedUser = await newUser.save();
+
+                return res.status(201).json({
+                  message: 'User was successfully registered!',
+                  product: savedUser,
+                });
             }
-          });
+        } catch (error) {
+            console.error('Error:', error);
+            res.status(500).send('Internal Server Error');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Internal Server Error');
-      }
     }
 
 // [SECTION] User Logins
