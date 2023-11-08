@@ -100,4 +100,15 @@ export async function login(req, res){
     }
 }
 
+// [SECTION] User retrieves profile details
+export async function profile(req, res){
+    try {
+        const userProfile = await User.findById(req.body.id)
+
+        return
+        
+    } catch (error) {
+        
+    }
+}
 export default getAllUsers;
