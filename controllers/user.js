@@ -51,8 +51,6 @@ export async function getAllUsers (req, res){
 //         }
 //     }
 export async function registerUser(req, res) {
-    console.log(req.body);
-  
     const newUser = new User({
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),

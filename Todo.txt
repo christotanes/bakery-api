@@ -2,10 +2,10 @@ Capstone Min Reqs
     >>> User Registration FIRST
     >>> User authentication
     >>> Create Product (Admin Only)
-    Retrieve all products
-    Retrieve all active products
-    Retrieve single product
-    Update Product info (Admin Only)
+    >>>Retrieve all products
+    >>>Retrieve all active products
+    >>>Retrieve single product
+    >>>Update Product info (Admin Only)
     Archive Product (Admin only)
     Activate Product (Admin only)
     Non-admin User checkout (Create Order)
