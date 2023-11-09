@@ -42,7 +42,13 @@ export async function createProduct (req, res){
                 type: req.body.type,
                 size: req.body.size,
                 quantity: req.body.quantity,
-                price: req.body.price
+                price: req.body.price,
+                allergens: req.body.allergens,
+                weight: req.body.weight,
+                deliveryAvailable: req.body.deliveryAvailable,
+                flavors: req.body.flavors,
+                bestBefore: req.body.bestBefore,
+                vegetarian: req.body.vegetarian
             });
     
             const savedProduct = await newProduct.save();
@@ -100,9 +106,8 @@ export async function getProductById(req, res){
 }
 
 // [SECTION - ADMIN] Update Product
-// NEED TO TEST THIS
 export async function updateProduct(req, res) {
-  const { id, ...updates } = req.body;
+  const { id, isActive, ...updates } = req.body;
 
   try {
     const productToUpdate = await Product.findByIdAndUpdate(id, updates, { new: true });
@@ -126,60 +131,73 @@ export async function updateProduct(req, res) {
 
 
 // [SECTION - ADMIN] Archive Product
-export async function archiveProduct(req,res){
+export async function archiveProduct(req, res) {
   try {
-    const productToArchive = await Product.findById(req.body.id)
+    const productToArchive = await Product.findById(req.body.id);
 
-    if(!productToArchive){
+    if (!productToArchive) {
       return res.status(404).json({
         error: 'Not found',
         message: 'There is no product with that information'
-      })
-    } else if (productToArchive.isActive == false){
-      return res.status(409).json({
-        error: 'Conflict',
-        message: 'Product is already archived'
       });
     }
-    productToArchive.isActive = false
-    await productToArchive.save()
+
+    if (productToArchive.isActive === false) {
+      return res.status(200).json({
+        message: 'Product is already archived',
+        product: productToArchive
+      });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.body.id,
+      { isActive: false },
+      { new: true }
+    );
+
     return res.status(200).json({
       message: 'Product is successfully archived!',
-      product: productToArchive
+      product: updatedProduct
     });
-  } catch (error){
+  } catch (error) {
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 }
 
 // [SECTION - ADMIN] Activate Product
-export async function activateProduct(req,res){
+export async function activateProduct(req, res) {
   try {
-      const productToActivate = await Product.findById(req.body.id)
+    const productToActivate = await Product.findById(req.body.id);
 
-      if (!productToActivate) {
-        return res.status(404).json({
-          error: 'Not found',
-          message: 'There is no product with that information'
-        });
-      } else if(productToActivate.isActive == true){
-        return res.status(409).json({
-          error: 'Conflict',
-          message: 'Product is already activated'
-        });
-      };
+    if (!productToActivate) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'There is no product with that information'
+      });
+    }
 
-      productToActivate.isActive = true;
-      await productToActivate.save();
+    if (productToActivate.isActive === true) {
       return res.status(200).json({
-        message: 'Product is successfully activated!',
+        message: 'Product is already activated',
         product: productToActivate
-      })
+      });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.body.id,
+      { isActive: true },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      message: 'Product is successfully activated!',
+      product: updatedProduct
+    });
   } catch (error) {
     console.error(`Error: ${error}`);
-    return res.status(500).send('Internal Serve Error');
-  };
+    return res.status(500).send('Internal Server Error');
+  }
 }
 
 export default getAllProducts;

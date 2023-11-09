@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  orderedProduct: [
+  orderedProducts: [
     {
       products: [
         {
@@ -59,13 +59,8 @@ const userSchema = new mongoose.Schema({
         },
       ],
       paymentInfo: {
-        type: [
-          {
-            type: String,
-            enum: ['Cash on Delivery', 'Visa', 'Mastercard', 'Gcash']
-          },
-        ],
-        default: [],
+        type: String,
+        enum: ['Cash on Delivery', 'Visa', 'Mastercard', 'Gcash']
       },
       totalAmount: {
         type: Number,

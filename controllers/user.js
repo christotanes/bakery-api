@@ -101,20 +101,44 @@ export async function login(req, res){
 }
 
 // [SECTION] User retrieves profile details
-export async function profile(req, res){
+export async function getProfile(req, res){
     try {
-        const userProfile = await User.findById(req.params.id)
+        const userProfile = await User.findById(req.user.id)
         if (!userProfile) {
           return res.status(404).json({
             error: 'Not found',
             message: 'There is no user with that information'
           });
-        };
+        }; 
         return res.status(200).send(userProfile);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Server Internal Error');
     }
 }
+
+// [SECTION] User checkout 
+export async function userCheckout(req, res) {
+    const {...ordered} = req.body
+    try {
+        const userPurchased = await User.findByIdAndUpdate(req.user.id, ordered, { new: true });
+
+        if (!userPurchased) {
+            return res.status(404).json({
+              error: 'Not found',
+              message: 'There is no user with that information'
+            });
+          };
+        
+        return res.status(200).json({
+            message: 'You have successfully purchased these products!',
+            user: userPurchased
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Server Internal Error');
+    };
+};
+
 
 export default getAllUsers;
