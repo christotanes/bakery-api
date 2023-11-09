@@ -354,6 +354,16 @@ export async function userCheckout(req, res) {
         // Save the order
         const savedOrder = await newOrder.save();
 
+        // Update product quantities in MongoDB
+        for (const item of itemsInCart) {
+            const product = await Product.findById(item.productId);
+            if (product) {
+                // Decrease the quantity in the MongoDB
+                product.quantity -= item.quantity;
+                await product.save();
+            };
+        };
+
         // Clear user's cart
         user.cart = {
             products: [],

@@ -22,6 +22,7 @@ Stretch Goals
         - >>> Subtotal for each item
         - >>> Total price for all items
     >>>User VIEW CART
+    >>> User checkout of cart and quantity of products decreased
 
 Add Goal
     >>> Admin get orderbyid
