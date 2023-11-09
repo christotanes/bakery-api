@@ -8,11 +8,11 @@ Capstone Min Reqs
     >>>Update Product info (Admin Only)
     >>>Archive Product (Admin only)
     >>>Activate Product (Admin only)
-    Non-admin User checkout (Create Order)
+    >>>Non-admin User checkout (Create Order)
     >>>Retrieve User Details
 
 Stretch Goals
-    Set user as admin (Admin only)
+    >>>Set user as admin (Admin only)
     Retrieve authenticated user's orders
     Retrieve all orders (Admin only)
     Add to cart

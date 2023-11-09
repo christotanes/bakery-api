@@ -129,7 +129,6 @@ export async function updateProduct(req, res) {
   };
 }
 
-
 // [SECTION - ADMIN] Archive Product
 export async function archiveProduct(req, res) {
   try {
