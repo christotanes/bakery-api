@@ -350,13 +350,4 @@ export async function setAdmin(req, res) {
     };
 };
 
-// [SECTION - ADMIN - STRETCH] Retrieve all orders
-export async function getAllOrders(req, res) {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-
 export default getAllUsers;
