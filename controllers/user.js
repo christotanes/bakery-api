@@ -118,68 +118,6 @@ export async function getProfile(req, res){
     }
 }
 
-// [SECTION - ADMIN - STRETCH] Set User as Admin
-export async function setAdmin(req, res) {
-    try {
-        const userToAdmin = await User.findById(req.body.id);
-        if (!userToAdmin) {
-            return res.status(404).json({
-                error: 'No user found',
-                message: 'There is no user registered with that information'
-            });
-        };
-
-        if (userToAdmin.isAdmin === true) {
-            return res.status(200).json({
-                message: 'User is already an admin',
-                user: userToAdmin
-            });
-        };
-
-        const setUserAdmin = await User.findByIdAndUpdate(
-            req.body.id, 
-            { isAdmin: true}, 
-            {new: true});
-        
-        return res.status(200).json({
-            message: 'User has been set as an admin',
-            user: setUserAdmin
-        });
-    } catch (error) {
-        console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
-    };
-};
-
-// [SECTION - STRETCH] Retrieve user's orders
-export async function getOrders(req, res) {
-    try {
-        const userOrders = await Order.findById(req.user.id);
-
-        if (!userOrders) {
-            return res.status(404).json({
-                error: 'No Order id found',
-                message: 'User has no past orders yet'
-            });
-        };
-
-        if (userOrders.orderedProducts.length === 0) {
-            return res.status(204).json({
-                error: 'No orders found',
-                message: 'User has not ordered any products yet'
-            });
-        };
-
-        return res.status(200).json({
-            message: "These are the user's past orders",
-            orders: userOrders.orderedProducts
-        });
-    } catch (error) {
-        console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
-    };
-};
-
 // [SECTION - NOT INCLUDED] User updates profile
 export async function updateProfile(req, res) {
     const {id, isAdmin, password, orderedProducts, ...updates} = req.body
@@ -202,15 +140,6 @@ export async function updateProfile(req, res) {
         return res.status(500).send('Server Internal Error');
     };
 };
-
-// [SECTION - ADMIN - STRETCH] Retrieve all orders
-export async function getAllOrders(req, res) {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
 
 // [SECTION - STRETCH - CART] Add to cart
 export async function addProductToCart(req, res) {
@@ -264,7 +193,7 @@ export async function addProductToCart(req, res) {
 };
 
 // [SECTION - STRETCH - CART] Change product quantities and CAN REMOVE PRODUCTS just have to set input button when user clicks remove set Quantity in req.body.quantity to be 0
-export async function editProduct(req, res) {
+export async function editCart(req, res) {
     try {
       const user = await User.findById(req.user.id);
       if (!user) {
@@ -366,5 +295,68 @@ export async function userCheckout(req, res) {
         return res.status(500).send('Server Internal Error');
     };
 };
+
+// [SECTION - STRETCH] Retrieve user's orders
+export async function getOrders(req, res) {
+    try {
+        const userOrders = await Order.find({userId: req.user.id});
+        if (!userOrders) {
+            return res.status(204).json({
+                error: 'No User id found',
+                message: 'User has no past or current orders'
+            });
+        };
+
+        return res.status(200).json({
+            message: "These are the user's past orders",
+            orders: userOrders
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Server Internal Error');
+    };
+};
+
+// [SECTION - ADMIN - STRETCH] Set User as Admin
+export async function setAdmin(req, res) {
+    try {
+        const userToAdmin = await User.findById(req.body.id);
+        if (!userToAdmin) {
+            return res.status(404).json({
+                error: 'No user found',
+                message: 'There is no user registered with that information'
+            });
+        };
+
+        if (userToAdmin.isAdmin === true) {
+            return res.status(200).json({
+                message: 'User is already an admin',
+                user: userToAdmin
+            });
+        };
+
+        const setUserAdmin = await User.findByIdAndUpdate(
+            req.body.id, 
+            { isAdmin: true}, 
+            {new: true});
+        
+        return res.status(200).json({
+            message: 'User has been set as an admin',
+            user: setUserAdmin
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Server Internal Error');
+    };
+};
+
+// [SECTION - ADMIN - STRETCH] Retrieve all orders
+export async function getAllOrders(req, res) {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
 
 export default getAllUsers;

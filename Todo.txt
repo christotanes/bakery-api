@@ -15,13 +15,14 @@ Stretch Goals
     >>>Set user as admin (Admin only)
     >>>Retrieve authenticated user's orders
     Retrieve all orders (Admin only)
-    Add to cart
+    >>>Add to cart
         - >>> Added Products
         - >>> Change product quantities
         - >>> Remove products from cart
         - >>> Subtotal for each item
         - >>> Total price for all items
     User VIEW CART
+    
 Add Goal
     >>> Update User profile
     > Change User password

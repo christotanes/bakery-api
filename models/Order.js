@@ -32,7 +32,7 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'completed'],
         required: [true, 'Order Status is Required'],
-        default: ['pending']
+        default: 'pending'
     },
     purchasedOn: {
         type: Date,
