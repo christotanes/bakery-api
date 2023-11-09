@@ -21,6 +21,7 @@ Stretch Goals
         - >>> Remove products from cart
         - >>> Subtotal for each item
         - >>> Total price for all items
+    User VIEW CART
 Add Goal
     >>> Update User profile
     > Change User password

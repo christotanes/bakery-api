@@ -28,20 +28,6 @@ const orderSchema = new mongoose.Schema({
         enum: ['Cash on Delivery', 'Visa', 'Mastercard', 'Gcash'],
         required: [true, 'PaymentInfo is Required']
     },
-    deliveryAddress:{
-        houseNo: {
-            type: String,
-            required: [true, 'House/Street No. is Required']
-        },
-        streetName: {
-            type: String,
-            required: [true, 'Street name is Required']
-        },
-        city: {
-            type: String,
-            required: [true, 'City name is Required']
-        },
-    },
     orderStatus: {
         type: String,
         enum: ['pending', 'completed'],

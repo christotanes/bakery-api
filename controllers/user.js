@@ -222,7 +222,7 @@ export async function addProductToCart(req, res) {
             message: 'User not found'
             });
         };
-  
+
         const { productId, price, quantity } = req.body;
         const newProduct = {
             productId,
@@ -264,7 +264,7 @@ export async function addProductToCart(req, res) {
 };
 
 // [SECTION - STRETCH - CART] Change product quantities and CAN REMOVE PRODUCTS just have to set input button when user clicks remove set Quantity in req.body.quantity to be 0
-export async function editProductQuantity(req, res) {
+export async function editProduct(req, res) {
     try {
       const user = await User.findById(req.user.id);
       if (!user) {
