@@ -21,14 +21,16 @@ Stretch Goals
         - >>> Remove products from cart
         - >>> Subtotal for each item
         - >>> Total price for all items
-    User VIEW CART
+    >>>User VIEW CART
 
 Add Goal
     >>> Admin get orderbyid
+    >>> Admin update order
     >>> Update User profile
-    > Change User password
+    >>> Change User password
     > Reset user password (Admin)?????
     > Add email
+
 Bakery Project
 > Start FE of capstone
 > What BE needs

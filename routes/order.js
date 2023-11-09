@@ -6,7 +6,8 @@ import { verify, verifyAdmin } from '../auth.js';
 const router = express.Router();
 
 router.get("/", verify, verifyAdmin, getAllOrders);
-router.get("/:orderId", verify, verifyAdmin, getOrderById);
-router.put("/:orderId", verify, verifyAdmin, updateOrder)
+router.route('/:orderId')
+        .get(verify, verifyAdmin, getOrderById)
+        .patch(verify, verifyAdmin, updateOrder)
 
 export default router

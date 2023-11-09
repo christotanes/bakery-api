@@ -7,7 +7,7 @@ import Order from '../models/Order.js';
 import { createAccessToken } from '../auth.js';
 // import cheerio from 'cheerio';
 // import axios from 'axios';
-
+    
 // [SECTION] Admin GETS all users
 export async function getAllUsers (req, res){
     try{
@@ -84,7 +84,7 @@ export async function login(req, res){
     try{
         const user = await User.findOne({ email: req.body.email});
         // console.log(user)
-        if(user == null){
+        if(!user){
             return res.status(404).json({error: 'There is no account registered under this email'});
         } else {
             const isPasswordCorrect = bcrypt.compareSync(req.body.password, user.password);
@@ -103,14 +103,17 @@ export async function login(req, res){
 
 // [SECTION] User retrieves profile details
 export async function getProfile(req, res){
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
+    };
     try {
-        const userProfile = await User.findById(req.params.id)
+        const userProfile = await User.findById(req.user.id)
         if (!userProfile) {
           return res.status(404).json({
             error: 'Not found',
             message: 'There is no user with that information'
           });
-        }; 
+        };
         return res.status(200).send(userProfile);
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -120,6 +123,9 @@ export async function getProfile(req, res){
 
 // [SECTION - NOT INCLUDED] User updates profile
 export async function updateProfile(req, res) {
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
+    };
     const {id, isAdmin, password, orderedProducts, ...updates} = req.body
     try {
         const userProfile = await User.findByIdAndUpdate(req.user.id, updates, {new: true});
@@ -141,8 +147,73 @@ export async function updateProfile(req, res) {
     };
 };
 
+// [SECTION - ADDGOAL] Change password
+export async function changePassword(req, res) {
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({ error: 'Unauthorized - Incorrect token' });
+    };
+
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                error: 'No file found',
+                message: 'User password update failed'
+            });
+        };
+
+        const checkNewPassword = bcrypt.compareSync(req.body.newPassword, user.password);
+        if (checkNewPassword) {
+            return res.status(401).json({ message: 'Please select a new password'});
+        };
+
+        if (req.body.newPassword !== req.body.confirmPassword) {
+            return res.status(401).json({ message: 'Your new password and confirm password do not match'});
+        };
+
+        user.password = bcrypt.hashSync(req.body.newPassword, 10);
+        await user.save();
+
+        return res.status(200).json({ message: 'Password successfully changed' });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
+
+// [SECTION - CART - ADDGOAL] User retrieves/views cart
+export async function viewCart(req, res) {
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
+    };
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                error: 'No file found',
+                message: 'There is no user with that id'
+            });
+        };
+
+        if (!user.cart || user.cart.products.length === 0) {
+            return res.status(204).send('Your cart has no contents');
+        };
+
+        return res.status(200).json({
+            message: "Here are the contents of your cart",
+            cart: user.cart
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
+
 // [SECTION - STRETCH - CART] Add to cart
 export async function addProductToCart(req, res) {
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
+    };
     try {
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -194,6 +265,9 @@ export async function addProductToCart(req, res) {
 
 // [SECTION - STRETCH - CART] Change product quantities and CAN REMOVE PRODUCTS just have to set input button when user clicks remove set Quantity in req.body.quantity to be 0
 export async function editCart(req, res) {
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
+    };
     try {
       const user = await User.findById(req.user.id);
       if (!user) {
@@ -201,7 +275,7 @@ export async function editCart(req, res) {
           error: 'Not found',
           message: 'User not found',
         });
-      }
+      };
   
       const { productId, quantity } = req.body;
   
@@ -249,46 +323,49 @@ export async function editCart(req, res) {
 
 // [SECTION] User checkout with Cart added
 export async function userCheckout(req, res) {
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
+    };
     try {
     // Find user
-    const user = await User.findById(req.user.id);
-    if (!user) {
-        return res.status(404).json({
-        error: 'Not found',
-        message: 'There is no user with that information'
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+            error: 'Not found',
+            message: 'There is no user with that information'
+            });
+        };
+
+        // Prepare purchased items
+        const itemsInCart = user.cart.products.map(product => ({
+            productId: product.productId,
+            quantity: product.quantity
+        }));
+
+        // Create an order
+        const newOrder = new Order({
+            userId: req.user.id,
+            products: itemsInCart,
+            totalAmount: user.cart.totalAmount,
+            paymentInfo: req.body.paymentInfo,
+            orderStatus: 'pending'
         });
-    }
 
-    // Prepare purchased items
-    const itemsInCart = user.cart.products.map(product => ({
-        productId: product.productId,
-        quantity: product.quantity
-    }));
+        // Save the order
+        const savedOrder = await newOrder.save();
 
-    // Create an order
-    const newOrder = new Order({
-        userId: req.user.id,
-        products: itemsInCart,
-        totalAmount: user.cart.totalAmount,
-        paymentInfo: req.body.paymentInfo,
-        orderStatus: 'pending'
-    });
+        // Clear user's cart
+        user.cart = {
+            products: [],
+            totalAmount: 0
+        };
 
-    // Save the order
-    const savedOrder = await newOrder.save();
+        await user.save();
 
-    // Clear user's cart
-    user.cart = {
-        products: [],
-        totalAmount: 0
-    };
-
-    await user.save();
-
-    return res.status(200).json({
-        message: 'You have successfully purchased these products!',
-        purchasedInfo: itemsInCart,
-        orderInfo: savedOrder
+        return res.status(200).json({
+            message: 'You have successfully purchased these products!',
+            purchasedInfo: itemsInCart,
+            orderInfo: savedOrder
     });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -298,6 +375,9 @@ export async function userCheckout(req, res) {
 
 // [SECTION - STRETCH] Retrieve user's orders
 export async function getOrders(req, res) {
+    if (req.params.id !== req.user.id) {
+        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
+    };
     try {
         const userOrders = await Order.find({userId: req.user.id});
         if (!userOrders) {
