@@ -19,7 +19,7 @@ export async function getAllOrders(req, res) {
         })
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error')
+        return res.status(500).send('Internal Server Error')
     };
 };
 
@@ -40,7 +40,7 @@ export async function getOrderById(req, res) {
         });
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
+        return res.status(500).send('Internal Server Error');
     };
 };
 
@@ -48,10 +48,31 @@ export async function getOrderById(req, res) {
 export async function updateOrder(req,res) {
     const {id, userId, ...updates} = req.body
     try {
-        const orderToUpdate = await Order.findById(req.params.orderId)
+        const orderToUpdate = await Order.findById(req.params.orderId);
+        if (!orderToUpdate) {
+            return res.status(404).json({
+                error: 'No file found',
+                message: 'There is no order file associated with that orderId'
+            });
+        };
+
+        const updateOrder = await Order.findByIdAndUpdate(req.params.orderId, updates, { new: true});
+
+        if (!updatedOrder) {
+            return res.status(500).json({
+                error: 'Internal Server Error',
+                message: 'Failed to update the order',
+            });
+        };
+
+        return res.status(200).json({
+            message: 'Order was successfully updated',
+            order: updateOrder
+        });
     } catch (error) {
-        
-    }
-}
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
 
 export default getAllOrders;

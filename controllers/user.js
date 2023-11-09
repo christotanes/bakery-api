@@ -114,7 +114,7 @@ export async function getProfile(req, res){
         return res.status(200).send(userProfile);
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
+        return res.status(500).send('Internal Server Error');
     }
 }
 
@@ -137,7 +137,7 @@ export async function updateProfile(req, res) {
         });
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
+        return res.status(500).send('Internal Server Error');
     };
 };
 
@@ -188,7 +188,7 @@ export async function addProductToCart(req, res) {
         });
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
+        return res.status(500).send('Internal Server Error');
     };
 };
 
@@ -243,7 +243,7 @@ export async function editCart(req, res) {
       });
     } catch (error) {
       console.error(`Error: ${error}`);
-      return res.status(500).send('Server Internal Error');
+      return res.status(500).send('Internal Server Error');
     }
 }
 
@@ -292,7 +292,7 @@ export async function userCheckout(req, res) {
     });
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
+        return res.status(500).send('Internal Server Error');
     };
 };
 
@@ -313,7 +313,7 @@ export async function getOrders(req, res) {
         });
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
+        return res.status(500).send('Internal Server Error');
     };
 };
 
@@ -346,7 +346,7 @@ export async function setAdmin(req, res) {
         });
     } catch (error) {
         console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
+        return res.status(500).send('Internal Server Error');
     };
 };
 
