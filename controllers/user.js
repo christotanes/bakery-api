@@ -233,5 +233,26 @@ export async function getOrders(req, res) {
 };
 
 // [SECTION - NOT INCLUDED] User updates profile
+export async function updateProfile(req, res) {
+    const {id, isAdmin, password, orderedProducts, ...updates} = req.body
+    try {
+        const userProfile = await User.findByIdAndUpdate(req.user.id, updates, {new: true});
+
+        if (!userProfile) {
+            return res.status(404).json({
+                error: 'No user found',
+                message: 'User profile update failed'
+            });
+        };
+
+        return res.status(200).json({
+            message: "User profile successfully updated",
+            userProfile: userProfile
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Server Internal Error');
+    };
+};
 
 export default getAllUsers;

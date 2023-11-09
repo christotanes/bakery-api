@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/", getAllProducts)
 router.post("/createProduct", verify, verifyAdmin, createProduct);
-router.get('/active', activeProducts);
+router.get('/active', verify, verifyAdmin, activeProducts);
 router.get('/:id', getProductById);
 router.put('/update', verify, verifyAdmin, updateProduct);
 router.patch('/archive', verify, verifyAdmin, archiveProduct);

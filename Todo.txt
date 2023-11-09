@@ -13,7 +13,7 @@ Capstone Min Reqs
 
 Stretch Goals
     >>>Set user as admin (Admin only)
-    Retrieve authenticated user's orders
+    >>>Retrieve authenticated user's orders
     Retrieve all orders (Admin only)
     Add to cart
         - Added Products
@@ -21,7 +21,11 @@ Stretch Goals
         - Remove products from cart
         - Subtotal for each item
         - Total price for all items
-
+Add Goal
+    >>> Update User profile
+    > Change User password
+    > Reset user password (Admin)?????
+    > Add email
 Bakery Project
 > Start FE of capstone
 > What BE needs
