@@ -33,10 +33,10 @@ export function verify (req, res, next) {
                 console.log(decodedToken);
                 req.user = decodedToken
                 next();
-            }
+            };
         })
-    }
-}
+    };
+};
 
 export function verifyAdmin (req, res, next){
     if(req.user.isAdmin){
@@ -46,6 +46,6 @@ export function verifyAdmin (req, res, next){
             auth: "Failed",
             message: "Action Forbidden! Requires admin privileges.",
         });
-    }
-}
+    };
+};
 export default createAccessToken
