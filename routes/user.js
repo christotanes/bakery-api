@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", verify, verifyAdmin, getAllUsers)
 router.post("/register", registerUser);
 router.post("/login", login);
-router.get("/profile", verify, getProfile);
+router.get("/:id/profile", verify, getProfile);
 
 export default router
 
