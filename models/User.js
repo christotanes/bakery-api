@@ -42,22 +42,22 @@ const userSchema = new mongoose.Schema({
   },
   orderedProducts: [
     {
-      products: [
-        {
-          productId: {
-            type: String,
-            required: [true, 'Product ID is required']
-          },
-          productName: {
-            type: String,
-            required: [true, 'Product Name is Required']
-          },
-          quantity: {
-            type: Number,
-            required: [true, 'Quantity bought is Required']
-          },
-        },
-      ],
+      products:[
+          {
+            productId: {
+              type: String,
+              required: [true, 'Product ID is required']
+            },
+            productName: {
+              type: String,
+              required: [true, 'Product Name is Required']
+            },
+            quantity: {
+              type: Number,
+              required: [true, 'Quantity bought is Required']
+            },
+          }
+        ],
       paymentInfo: {
         type: String,
         enum: ['Cash on Delivery', 'Visa', 'Mastercard', 'Gcash']

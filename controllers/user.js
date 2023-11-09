@@ -2,6 +2,7 @@ console.log("Hello world from controllers/user.js");
 import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
+import Product from '../models/Product.js';
 import { createAccessToken } from '../auth.js';
 // import cheerio from 'cheerio';
 // import axios from 'axios';
@@ -103,7 +104,7 @@ export async function login(req, res){
 // [SECTION] User retrieves profile details
 export async function getProfile(req, res){
     try {
-        const userProfile = await User.findById(req.user.id)
+        const userProfile = await User.findById(userId)
         if (!userProfile) {
           return res.status(404).json({
             error: 'Not found',
@@ -119,26 +120,55 @@ export async function getProfile(req, res){
 
 // [SECTION] User checkout 
 export async function userCheckout(req, res) {
-    const {...ordered} = req.body
+    let userId = req.user.id;
     try {
-        const userPurchased = await User.findByIdAndUpdate(req.user.id, ordered, { new: true });
-
-        if (!userPurchased) {
+        let userPurchasedUpdate = await User.findById(userId);
+        if (!userPurchasedUpdate) {
             return res.status(404).json({
               error: 'Not found',
               message: 'There is no user with that information'
             });
           };
-        
+
+        let itemsPurchased = { 
+            products: [
+                {
+                    productId: req.body.productId,
+                    productName: req.body.productName,
+                    quantity: req.body.quantity
+                }
+            ],
+            paymentInfo: req.body.paymentInfo,
+            totalAmount: req.body.totalAmount
+        };
+        userPurchasedUpdate.orderedProducts.push(itemsPurchased);
+        await userPurchasedUpdate.save();
+
+        let productPurchasedUpdate = await Product.findById(req.body.productId);
+        if (!productPurchasedUpdate) {
+            return res.status(404).json({
+              error: 'Not found',
+              message: 'There is no product with that information'
+            });
+          };
+
+        let userOrder = {
+            userId: userId,
+            orderId: userPurchasedUpdate.orderedProducts[userPurchasedUpdate.orderedProducts.length-1].id
+        }
+
+        productPurchasedUpdate.userOrders.push(userOrder);
+        await productPurchasedUpdate.save();
+
         return res.status(200).json({
             message: 'You have successfully purchased these products!',
-            user: userPurchased
+            purchasedInfo: userPurchasedUpdate.orderedProducts,
+            productInfoUpdate: productPurchasedUpdate.userOrders
         });
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Server Internal Error');
     };
 };
-
 
 export default getAllUsers;
