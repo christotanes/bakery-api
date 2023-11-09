@@ -72,6 +72,30 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  cart: [
+    {
+      products:[
+        {
+          productId: {
+            type: String,
+            required: [true, 'Product ID is required']
+          },
+          productName: {
+            type: String,
+            required: [true, 'Product Name is Required']
+          },
+          quantity: {
+            type: Number,
+            required: [true, 'Quantity bought is Required']
+          },
+        }
+      ],
+      totalAmount: {
+        type: Number,
+        required: [true, 'Total Amount is Required']
+      },
+    }
+  ],
   createdOn: {
     type: Date,
     default: new Date()

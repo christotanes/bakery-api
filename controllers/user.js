@@ -117,58 +117,72 @@ export async function getProfile(req, res){
     }
 }
 
-// [SECTION] User checkout 
+// [SECTION] User checkout with Cart added
 export async function userCheckout(req, res) {
-    let userId = req.user.id;
+    const userId = req.user.id;
+  
     try {
-        let userPurchasedUpdate = await User.findById(userId);
-        if (!userPurchasedUpdate) {
-            return res.status(404).json({
-              error: 'Not found',
-              message: 'There is no user with that information'
-            });
-          };
-
-        let itemsPurchased = { 
-            users: [
-                {
-                    productId: req.body.productId,
-                    productName: req.body.productName,
-                    quantity: req.body.quantity
-                }
-            ],
-            paymentInfo: req.body.paymentInfo,
-            totalAmount: req.body.totalAmount
-        };
-        userPurchasedUpdate.orderedProducts.push(itemsPurchased);
-        await userPurchasedUpdate.save();
-
-        let productPurchasedUpdate = await Product.findById(req.body.productId);
-        if (!productPurchasedUpdate) {
-            return res.status(404).json({
-              error: 'Not found',
-              message: 'There is no product with that information'
-            });
-          };
-
-        let userOrder = {
-            userId: userId,
-            orderId: userPurchasedUpdate.orderedProducts[userPurchasedUpdate.orderedProducts.length-1].id
-        }
-
-        productPurchasedUpdate.userOrders.push(userOrder);
-        await productPurchasedUpdate.save();
-
-        return res.status(200).json({
-            message: 'You have successfully purchased these products!',
-            purchasedInfo: userPurchasedUpdate.orderedProducts,
-            productInfoUpdate: productPurchasedUpdate.userOrders
+      // Find user
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          error: 'Not found',
+          message: 'There is no user with that information'
         });
+      }
+  
+      // Prepare purchased items
+      const purchasedItems = req.body.products.map(product => ({
+        productId: product.productId,
+        productName: product.productName,
+        quantity: product.quantity
+      }));
+  
+      // Update user's purchased products
+      user.orderedProducts.push({
+        products: purchasedItems, 
+        paymentInfo: req.body.paymentInfo,
+        totalAmount: req.body.totalAmount
+      });
+  
+      // Filter out checked out items from the user's cart
+      user.cart = user.cart.filter(cartItem => !purchasedItems.some(purchasedItem => purchasedItem.productId === cartItem.productId));
+  
+      await user.save();
+  
+      // Find and update the purchased products
+      const productIds = purchasedItems.map(item => item.productId);
+      const products = await Product.updateMany(
+        { _id: { $in: productIds } },
+        {
+          $push: {
+            userOrders: {
+              userId,
+              orderId: user.orderedProducts[user.orderedProducts.length - 1].id
+            }
+          }
+        },
+        { new: true }
+      );
+  
+      if (!products || products.some(product => !product)) {
+        return res.status(404).json({
+          error: 'Not found',
+          message: 'One or more products do not exist'
+        });
+      }
+  
+      return res.status(200).json({
+        message: 'You have successfully purchased these products!',
+        purchasedInfo: user.orderedProducts,
+        productInfoUpdate: products.map(product => product.userOrders)
+      });
     } catch (error) {
-        console.error(`Error: ${error}`);
-        return res.status(500).send('Server Internal Error');
-    };
-};
+      console.error(`Error: ${error}`);
+      return res.status(500).send('Server Internal Error');
+    }
+  };
+  
 
 // [SECTION - ADMIN - STRETCH] Set User as Admin
 export async function setAdmin(req, res) {
@@ -255,4 +269,12 @@ export async function updateProfile(req, res) {
     };
 };
 
+// [SECTION - ADMIN - STRETCH] Retrieve all orders
+export async function getAllOrders(req, res) {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
 export default getAllUsers;
