@@ -61,18 +61,6 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  userOrders: [
-    {
-      userId: {
-        type: String,
-        required: [true, 'userId is Required']
-      },
-      orderId: {
-        type: String,
-        required: [true, 'orderId is Required']
-      }
-    }
-  ],
   createdOn: {
     type: Date,
     default: new Date()

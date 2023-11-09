@@ -110,7 +110,7 @@ export async function updateProduct(req, res) {
   const { id, isActive, ...updates } = req.body;
 
   try {
-    const productToUpdate = await Product.findByIdAndUpdate(id, updates, { new: true });
+    const productToUpdate = await Product.findByIdAndUpdate(req.params.id, updates, { new: true });
 
     if (!productToUpdate) {
       return res.status(404).json({
@@ -132,7 +132,7 @@ export async function updateProduct(req, res) {
 // [SECTION - ADMIN] Archive Product
 export async function archiveProduct(req, res) {
   try {
-    const productToArchive = await Product.findById(req.body.id);
+    const productToArchive = await Product.findById(req.params.id);
 
     if (!productToArchive) {
       return res.status(404).json({
@@ -149,7 +149,7 @@ export async function archiveProduct(req, res) {
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.body.id,
+      req.params.id,
       { isActive: false },
       { new: true }
     );
@@ -167,7 +167,7 @@ export async function archiveProduct(req, res) {
 // [SECTION - ADMIN] Activate Product
 export async function activateProduct(req, res) {
   try {
-    const productToActivate = await Product.findById(req.body.id);
+    const productToActivate = await Product.findById(req.params.id);
 
     if (!productToActivate) {
       return res.status(404).json({
@@ -184,7 +184,7 @@ export async function activateProduct(req, res) {
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.body.id,
+      req.params.id,
       { isActive: true },
       { new: true }
     );

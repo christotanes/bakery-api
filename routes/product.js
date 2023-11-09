@@ -9,9 +9,9 @@ router.get("/", getAllProducts)
 router.post("/createProduct", verify, verifyAdmin, createProduct);
 router.get('/active', verify, verifyAdmin, activeProducts);
 router.get('/:id', getProductById);
-router.put('/update', verify, verifyAdmin, updateProduct);
-router.patch('/archive', verify, verifyAdmin, archiveProduct);
-router.patch('/activate', verify, verifyAdmin, activateProduct);
+router.put('/:id', verify, verifyAdmin, updateProduct);
+router.put('/:id/archive', verify, verifyAdmin, archiveProduct);
+router.put('/:id/activate', verify, verifyAdmin, activateProduct);
 
 export default router
 

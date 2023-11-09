@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import productRoute from './routes/product.js';
 import userRoute from './routes/user.js';
+import orderRoute from './routes/order.js';
 
 const app = express();
 const port = 4000;
@@ -22,6 +23,7 @@ app.use(express.json());
 // app.use('/', productRoute);
 app.use('/users', userRoute);
 app.use('/products', productRoute);
+app.use('/orders', orderRoute);
 
 // Listen to the port
 

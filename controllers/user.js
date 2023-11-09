@@ -3,6 +3,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
+import Order from '../models/Order.js';
 import { createAccessToken } from '../auth.js';
 // import cheerio from 'cheerio';
 // import axios from 'axios';
@@ -103,7 +104,7 @@ export async function login(req, res){
 // [SECTION] User retrieves profile details
 export async function getProfile(req, res){
     try {
-        const userProfile = await User.findById(userId)
+        const userProfile = await User.findById(req.params.id)
         if (!userProfile) {
           return res.status(404).json({
             error: 'Not found',
@@ -116,73 +117,6 @@ export async function getProfile(req, res){
         return res.status(500).send('Server Internal Error');
     }
 }
-
-// [SECTION] User checkout with Cart added
-export async function userCheckout(req, res) {
-    const userId = req.user.id;
-  
-    try {
-      // Find user
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({
-          error: 'Not found',
-          message: 'There is no user with that information'
-        });
-      }
-  
-      // Prepare purchased items
-      const purchasedItems = req.body.products.map(product => ({
-        productId: product.productId,
-        productName: product.productName,
-        quantity: product.quantity
-      }));
-  
-      // Update user's purchased products
-      user.orderedProducts.push({
-        products: purchasedItems, 
-        paymentInfo: req.body.paymentInfo,
-        totalAmount: req.body.totalAmount
-      });
-  
-      // Filter out checked out items from the user's cart
-      user.cart = user.cart.filter(cartItem => !purchasedItems.some(purchasedItem => purchasedItem.productId === cartItem.productId));
-  
-      await user.save();
-  
-      // Find and update the purchased products
-      const productIds = purchasedItems.map(item => item.productId);
-      const products = await Product.updateMany(
-        { _id: { $in: productIds } },
-        {
-          $push: {
-            userOrders: {
-              userId,
-              orderId: user.orderedProducts[user.orderedProducts.length - 1].id
-            }
-          }
-        },
-        { new: true }
-      );
-  
-      if (!products || products.some(product => !product)) {
-        return res.status(404).json({
-          error: 'Not found',
-          message: 'One or more products do not exist'
-        });
-      }
-  
-      return res.status(200).json({
-        message: 'You have successfully purchased these products!',
-        purchasedInfo: user.orderedProducts,
-        productInfoUpdate: products.map(product => product.userOrders)
-      });
-    } catch (error) {
-      console.error(`Error: ${error}`);
-      return res.status(500).send('Server Internal Error');
-    }
-  };
-  
 
 // [SECTION - ADMIN - STRETCH] Set User as Admin
 export async function setAdmin(req, res) {
@@ -220,12 +154,12 @@ export async function setAdmin(req, res) {
 // [SECTION - STRETCH] Retrieve user's orders
 export async function getOrders(req, res) {
     try {
-        const userOrders = await User.findById(req.user.id);
+        const userOrders = await Order.findById(req.user.id);
 
         if (!userOrders) {
             return res.status(404).json({
-                error: 'No user found',
-                message: 'There is no user registered with that information'
+                error: 'No Order id found',
+                message: 'User has no past orders yet'
             });
         };
 
@@ -277,4 +211,160 @@ export async function getAllOrders(req, res) {
         
     }
 }
+
+// [SECTION - STRETCH - CART] Add to cart
+export async function addProductToCart(req, res) {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+        return res.status(404).json({
+            error: 'Not found',
+            message: 'User not found'
+            });
+        };
+  
+        const { productId, price, quantity } = req.body;
+        const newProduct = {
+            productId,
+            price,
+            quantity,
+            subTotal: price * quantity
+        };
+    
+        // Check if the product already exists in the cart
+        const existingProductIndex = user.cart.products.findIndex(
+        (product) => product.productId === newProduct.productId
+        );
+
+        if (existingProductIndex !== -1) {
+        // If the product exists, update its quantity and subTotal
+            user.cart.products[existingProductIndex].quantity += newProduct.quantity;
+            user.cart.products[existingProductIndex].subTotal += newProduct.subTotal;
+        } else {
+        // If the product is new, add it to the cart
+            user.cart.products.push(newProduct);
+        };
+
+        // Recalculate total amount based on the updated cart
+        const totalAmount = user.cart.products.reduce((total, product) => total + product.subTotal, 0);
+
+        // Update totalAmount in the cart
+        user.cart.totalAmount = totalAmount;
+
+        await user.save();
+
+        return res.status(200).json({
+        message: 'Product added to the cart successfully!',
+        cart: user.cart
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Server Internal Error');
+    };
+};
+
+// [SECTION - STRETCH - CART] Change product quantities and CAN REMOVE PRODUCTS just have to set input button when user clicks remove set Quantity in req.body.quantity to be 0
+export async function editProductQuantity(req, res) {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({
+          error: 'Not found',
+          message: 'User not found',
+        });
+      }
+  
+      const { productId, quantity } = req.body;
+  
+      // Check if the product exists in the cart
+      const existingProductIndex = user.cart.products.findIndex(
+        (product) => product.productId === productId
+      );
+  
+      if (existingProductIndex !== -1) {
+        if (quantity === 0) {
+          // If quantity is 0, remove the product from the cart
+          user.cart.products.splice(existingProductIndex, 1);
+        } else {
+          // If the product exists, update its quantity and recalculate the subtotal
+          user.cart.products[existingProductIndex].quantity = quantity;
+          user.cart.products[existingProductIndex].subTotal = user.cart.products[existingProductIndex].price * quantity;
+        }
+      } else {
+        return res.status(404).json({
+          error: 'Not found',
+          message: 'Product not found in the cart',
+        });
+      }
+  
+      // Recalculate total amount based on the updated cart
+      const totalAmount = user.cart.products.reduce(
+        (total, product) => total + product.subTotal,
+        0
+      );
+  
+      // Update totalAmount in the cart
+      user.cart.totalAmount = totalAmount;
+  
+      await user.save();
+  
+      return res.status(200).json({
+        message: 'Product quantity updated successfully!',
+        cart: user.cart,
+      });
+    } catch (error) {
+      console.error(`Error: ${error}`);
+      return res.status(500).send('Server Internal Error');
+    }
+}
+
+// [SECTION] User checkout with Cart added
+export async function userCheckout(req, res) {
+    try {
+    // Find user
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        return res.status(404).json({
+        error: 'Not found',
+        message: 'There is no user with that information'
+        });
+    }
+
+    // Prepare purchased items
+    const itemsInCart = user.cart.products.map(product => ({
+        productId: product.productId,
+        quantity: product.quantity
+    }));
+
+    // Create an order
+    const newOrder = new Order({
+        userId: req.user.id,
+        products: itemsInCart,
+        totalAmount: user.cart.totalAmount,
+        paymentInfo: req.body.paymentInfo,
+        orderStatus: 'pending'
+    });
+
+    // Save the order
+    const savedOrder = await newOrder.save();
+
+    // Clear user's cart
+    user.cart = {
+        products: [],
+        totalAmount: 0
+    };
+
+    await user.save();
+
+    return res.status(200).json({
+        message: 'You have successfully purchased these products!',
+        purchasedInfo: itemsInCart,
+        orderInfo: savedOrder
+    });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Server Internal Error');
+    };
+};
+
 export default getAllUsers;

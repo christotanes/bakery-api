@@ -1,6 +1,6 @@
 console.log("Hello world from routes/user.js");
 import express from 'express';
-import { getAllUsers, registerUser, login, getProfile, userCheckout, updateProfile, setAdmin, getOrders, getAllOrders } from '../controllers/user.js';
+import { getAllUsers, registerUser, login, getProfile, userCheckout, updateProfile, addProductToCart, editProductQuantity, setAdmin, getOrders, getAllOrders } from '../controllers/user.js';
 import {verify, verifyAdmin} from '../auth.js'
 
 const router = express.Router();
@@ -8,11 +8,15 @@ const router = express.Router();
 router.get("/", verify, verifyAdmin, getAllUsers)
 router.post("/register", registerUser);
 router.post("/login", login);
-router.get("/profile", verify, getProfile);
-router.patch("/checkout", verify, userCheckout);
-router.put("/updateProfile", verify, updateProfile);
+router.get("/:id", verify, getProfile);
+router.put("/:id", verify, updateProfile);
+router.put("/:id/cart/add", verify, addProductToCart)
+router.patch("/:id/cart/edit", verify, editProductQuantity);
+
+router.post("/:id/checkout", verify, userCheckout);
+router.get("/:id/orders", verify, getOrders);
+
 router.patch("/setAdmin", verify, verifyAdmin, setAdmin);
-router.get("/orders", verify, getOrders);
 router.get("/allOrders", verify, verifyAdmin, getAllOrders);
 
 export default router
