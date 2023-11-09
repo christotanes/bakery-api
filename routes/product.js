@@ -8,10 +8,10 @@ const router = express.Router();
 router.get("/", getAllProducts)
 router.post("/createProduct", verify, verifyAdmin, createProduct);
 router.get('/active', verify, verifyAdmin, activeProducts);
-router.get('/:id', getProductById);
-router.put('/:id', verify, verifyAdmin, updateProduct);
-router.put('/:id/archive', verify, verifyAdmin, archiveProduct);
-router.put('/:id/activate', verify, verifyAdmin, activateProduct);
+router.get('/:productId', getProductById);
+router.put('/:productId', verify, verifyAdmin, updateProduct);
+router.put('/:productId/archive', verify, verifyAdmin, archiveProduct);
+router.put('/:productId/activate', verify, verifyAdmin, activateProduct);
 
 export default router
 

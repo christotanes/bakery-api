@@ -20,14 +20,14 @@ export function verify (req, res, next) {
     let token = req.headers.authorization;
 
     if(typeof token == 'undefined'){
-        return res.send({ auth: "Failed. No Token! "});
+        return res.send({ auth: "Failed. No Token! False "});
     } else {
         token = token.slice(7, token.length);
         jwt.verify(token, secret, (err, decodedToken) => {
             if(err){
                 return res.send({
                     auth: "Failed",
-                    message: err.message
+                    message: err.message + ' False'
                 });
             } else {
                 console.log(decodedToken);

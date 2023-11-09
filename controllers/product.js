@@ -87,7 +87,7 @@ export async function activeProducts(req, res){
 export async function getProductById(req, res){
   console.log(req.params)
   try{
-    const singleProduct = await Product.findById(req.params.id)
+    const singleProduct = await Product.findById(req.params.productId)
     // console.log(`singleProduct value: ${singleProduct}`)
     if(!singleProduct){
       return res.status(404).json({
@@ -107,10 +107,10 @@ export async function getProductById(req, res){
 
 // [SECTION - ADMIN] Update Product
 export async function updateProduct(req, res) {
-  const { id, isActive, ...updates } = req.body;
+  const { productId, isActive, ...updates } = req.body;
 
   try {
-    const productToUpdate = await Product.findByIdAndUpdate(req.params.id, updates, { new: true });
+    const productToUpdate = await Product.findByIdAndUpdate(req.params.productId, updates, { new: true });
 
     if (!productToUpdate) {
       return res.status(404).json({
@@ -132,7 +132,7 @@ export async function updateProduct(req, res) {
 // [SECTION - ADMIN] Archive Product
 export async function archiveProduct(req, res) {
   try {
-    const productToArchive = await Product.findById(req.params.id);
+    const productToArchive = await Product.findById(req.params.productId);
 
     if (!productToArchive) {
       return res.status(404).json({
@@ -149,7 +149,7 @@ export async function archiveProduct(req, res) {
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
+      req.params.productId,
       { isActive: false },
       { new: true }
     );
@@ -167,7 +167,7 @@ export async function archiveProduct(req, res) {
 // [SECTION - ADMIN] Activate Product
 export async function activateProduct(req, res) {
   try {
-    const productToActivate = await Product.findById(req.params.id);
+    const productToActivate = await Product.findById(req.params.productId);
 
     if (!productToActivate) {
       return res.status(404).json({
@@ -184,7 +184,7 @@ export async function activateProduct(req, res) {
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
+      req.params.productId,
       { isActive: true },
       { new: true }
     );
