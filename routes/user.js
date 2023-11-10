@@ -1,6 +1,6 @@
 console.log("Hello world from routes/user.js");
 import express from 'express';
-import { getAllUsers, registerUser, showRegisterPage, login, getProfile, updateProfile, changePassword, viewCart, addProductToCart, editCart, userCheckout, getUserOrders, setAdmin, getAllOrders, getFeedback, addFeedback, editFeedback, showFeedback, getAllFeedback  } from '../controllers/user.js';
+import { getAllUsers, registerUser, showRegisterPage, showLoginPage, login, getProfile, updateProfile, changePassword, viewCart, addProductToCart, editCart, userCheckout, getUserOrders, setAdmin, getAllOrders, getFeedback, addFeedback, editFeedback, showFeedback, getAllFeedback  } from '../controllers/user.js';
 import {verify, verifyAdmin} from '../auth.js'
 
 const router = express.Router();
@@ -29,7 +29,9 @@ router.route("/register")
     .get(showRegisterPage)
     .post(registerUser);
 
-    router.post("/login", login);
+    router.route('/login')
+    .get(showLoginPage)
+    .post(login);
 
 router.route("/feedback")
     .get(verify, getFeedback)

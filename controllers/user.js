@@ -24,10 +24,16 @@ export async function getAllUsers (req, res){
     }
 };
 
-// // [SECTION] Get Register
+// [SECTION] Get Register
 export async function showRegisterPage(req, res) {
     console.log('This is showRegisterPage function')
     return res.render("register.ejs")
+};
+
+// [SECTION] Get login
+export async function showLoginPage(req, res) {
+    console.log('This is showLoginPage function')
+    return res.render("login.ejs")
 };
 
 // [SECTION] Register User
@@ -42,12 +48,9 @@ export async function registerUser(req, res) {
             email: req.body.email,
             password: bcrypt.hashSync(req.body.password, 10),
         });
-        const savedUser = await newUser.save();
 
-        return res.status(201).render('register.ejs', {
-            message: 'User was successfully registered!',
-            user: savedUser
-        });
+        await newUser.save();
+        return res.redirect('./login');
     } catch (saveError) {
         if (saveError.name === 'MongoError' && saveError.code === 11000) {
         // Unique constraint violation (duplicate email)
@@ -73,7 +76,11 @@ export async function login(req, res){
             const isPasswordCorrect = bcrypt.compareSync(req.body.password, user.password);
 
             if(isPasswordCorrect){
-                return res.status(201).send({ access: createAccessToken(user) });
+                return res.status(201).json({
+                    access: createAccessToken(user),
+                    redirect: '../products', // Include the redirect URL in the JSON response
+                });
+                // return res.status(201).send({ access: createAccessToken(user) }).redirect('./products');
             } else {
                 return res.status(401).json({ error: 'Unauthorized - Incorrect password'});
             }
