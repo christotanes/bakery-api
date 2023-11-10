@@ -462,4 +462,129 @@ export async function getAllOrders(req, res) {
     };
 };
 
+// [SECTION - FEEDBACK - STRETCH] User retrieves feedback
+export async function getFeedback(req, res) {
+    console.log('This is the getFeedback function');
+    try {
+        const userBoughtProduct = await Order.find({ userId: req.user.id });
+        if (userBoughtProduct.length === 0) {
+            console.log(`Status 404 user has not bought product`)
+            return res.status(404).json({
+                error: 'User not found in orders',
+                message: "User has not bought this product"
+            });
+        };
+
+        await product.save();
+
+        return res.status(200).json({
+            message: "Review has been successfully added, moderators will verify the message first",
+            userReview: product.reviews
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
+
+// [SECTION - FEEDBACK - STRETCH] User adds/posts feedback
+export async function addFeedback(req, res) {
+    console.log('This is the addFeedback function');
+    try {
+        const userBoughtProduct = await Order.find({ userId: req.user.id });
+        if (userBoughtProduct.length === 0) {
+            console.log(`Status 404 user has not bought product`)
+            return res.status(404).json({
+                error: 'User not found in orders',
+                message: "User has not bought this product"
+            });
+        };
+
+        await product.save();
+
+        return res.status(200).json({
+            message: "Review has been successfully added, moderators will verify the message first",
+            userReview: product.reviews
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
+
+// [SECTION - FEEDBACK - STRETCH] User edits feedback
+export async function editFeedback(req, res) {
+    console.log('This is the editFeedback function');
+    try {
+        const userBoughtProduct = await Order.find({ userId: req.user.id });
+        if (userBoughtProduct.length === 0) {
+            console.log(`Status 404 user has not bought product`)
+            return res.status(404).json({
+                error: 'User not found in orders',
+                message: "User has not bought this product"
+            });
+        };
+
+        await product.save();
+
+        return res.status(200).json({
+            message: "Review has been successfully added, moderators will verify the message first",
+            userReview: product.reviews
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
+
+// [SECTION - FEEDBACK - STRETCH] Admin replies on the feedback
+export async function replyFeedback(req, res) {
+    console.log('This is the replyFeedback function');
+    try {
+        const userBoughtProduct = await Order.find({ userId: req.user.id });
+        if (userBoughtProduct.length === 0) {
+            console.log(`Status 404 user has not bought product`)
+            return res.status(404).json({
+                error: 'User not found in orders',
+                message: "User has not bought this product"
+            });
+        };
+
+        await product.save();
+
+        return res.status(200).json({
+            message: "Review has been successfully added, moderators will verify the message first",
+            userReview: product.reviews
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
+
+// [SECTION - FEEDBACK - STRETCH] Admin gets all feedback from all users
+export async function getAllFeedback(req, res) {
+    console.log('This is the getAllFeedback function');
+    try {
+        const userBoughtProduct = await Order.find({ userId: req.user.id });
+        if (userBoughtProduct.length === 0) {
+            console.log(`Status 404 user has not bought product`)
+            return res.status(404).json({
+                error: 'User not found in orders',
+                message: "User has not bought this product"
+            });
+        };
+
+        await product.save();
+
+        return res.status(200).json({
+            message: "Review has been successfully added, moderators will verify the message first",
+            userReview: product.reviews
+        });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
+
 export default getAllUsers;
