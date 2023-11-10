@@ -1,6 +1,7 @@
 console.log("Hello world from controllers/product.js");
 import express from 'express';
 import Product from '../models/Product.js';
+import Order from '../models/Order.js';
 // import bcrypt from 'bcrypt';
 // import cheerio from 'cheerio';
 // import axios from 'axios';
@@ -8,6 +9,7 @@ import Product from '../models/Product.js';
 
 // [SECTION] Get All Products
 export async function getAllProducts(req, res) {
+  console.log('This is createProduct function');
   try {
     const allProducts = await Product.find({});
 
@@ -27,6 +29,7 @@ export async function getAllProducts(req, res) {
 
 // [SECTION - ADMIN] Create Product
 export async function createProduct (req, res){
+    console.log('This is createProduct function');
     console.log(req.body)
     try {
         const productExists = await Product.findOne({ name: req.body.name });
@@ -66,6 +69,7 @@ export async function createProduct (req, res){
 
 // [SECTION] Retrieve all ACTIVE products
 export async function activeProducts(req, res){
+  console.log('This is activeProducts function');
   try{
     const activeProducts = await Product.find({ isActive: true});
 
@@ -85,7 +89,8 @@ export async function activeProducts(req, res){
 
 // [SECTION] Retrieve a SINGLE product
 export async function getProductById(req, res){
-  console.log(req.params)
+  console.log('This is getProductById function');
+  console.log(req.params);
   try{
     const singleProduct = await Product.findById(req.params.productId)
     // console.log(`singleProduct value: ${singleProduct}`)
@@ -107,6 +112,7 @@ export async function getProductById(req, res){
 
 // [SECTION - ADMIN] Update Product
 export async function updateProduct(req, res) {
+  console.log('This is updateProduct function');
   const { productId, isActive, ...updates } = req.body;
 
   try {
@@ -131,6 +137,7 @@ export async function updateProduct(req, res) {
 
 // [SECTION - ADMIN] Archive Product
 export async function archiveProduct(req, res) {
+  console.log('This is archiveProduct function');
   try {
     const productToArchive = await Product.findById(req.params.productId);
 
@@ -166,6 +173,7 @@ export async function archiveProduct(req, res) {
 
 // [SECTION - ADMIN] Activate Product
 export async function activateProduct(req, res) {
+  console.log('This is activateProduct function');
   try {
     const productToActivate = await Product.findById(req.params.productId);
 
@@ -198,6 +206,162 @@ export async function activateProduct(req, res) {
     return res.status(500).send('Internal Server Error');
   }
 }
+
+// [SECTION - STRECTH - Ratings] Admin gets ProductId's Specific Reviews
+export async function getAllProductReviews(req,res) {
+  console.log('This is getAllProductReviews function');
+  try {
+    const allReviews = await Product.findById(req.params.productId)
+    if (!product) {
+      return res.status(404).json({
+        error: 'Product not found',
+        message: 'There is no product registered with that id'
+      });
+    };
+    
+    if (allReviews.reviews.length === 0) {
+      return res.status(204).json({ message: "Product has not been reviewed yet" });
+    };
+
+    return res.status(200).json({
+      message: "These are this product's reviews",
+      reviews: allReviews.reviews
+    });
+  } catch (error) {
+    console.error(`Error: ${error}`);
+    return res.status(500).send('Internal Server Error');
+  };
+};
+
+// [SECTION - STRECTH - Ratings] User add's review
+export async function userAddReview(req,res) {
+  console.log('This is userAddReview function');
+  try {
+    const userBoughtProduct = await Order.find({ userId: req.user.id});
+    if (!userBoughtProduct) {
+      return res.status(204).json({
+        error: 'User not found in orders',
+        message: "User has not bought this product"
+      });
+    };
+    const product = await Product.findById(req.params.productId)
+    if (!product) {
+      return res.status(404).json({
+        error: 'Product not found',
+        message: 'There is no product registered with that id'
+      });
+    };
+
+    let userReview = {
+      userId: req.user.id,
+      rating: req.body.rating,
+      message: req.body.message
+    };
+
+    product.reviews.push(userReview);
+    await product.save();
+
+    return res.status(200).json({
+      message: "Review has been successfully added, moderators will verify the message first",
+      userReview: product.reviews
+    });
+  } catch (error) {
+    console.error(`Error: ${error}`);
+    return res.status(500).send('Internal Server Error');
+  };
+};
+
+// [SECTION - STRECTH - Ratings] User edit's review
+export async function userEditReview(req,res) {
+  console.log('This is userEditReview function');
+  const { userId, showReview, rating, message } = req.body;
+  try {
+    const product = await Product.findById(req.params.productId)
+    if (!product) {
+      return res.status(404).json({
+        error: 'Product not found',
+        message: 'There is no product registered with that id'
+      });
+    };
+
+    const userIdReviewIndex = product.reviews.findIndex(review => review.userId === req.user.id);
+    console.log('User review found at index:', userIdReviewIndex);
+
+    if (userIdReviewIndex === -1) {
+      console.log('No user review found');
+      return res.status(204).json({ message: "Product has not been reviewed by the user yet" });
+    };
+
+    // Changes the rating and message of the specific review without letting the user change the userId and showReview
+    product.reviews[userIdReviewIndex].rating = rating;
+    product.reviews[userIdReviewIndex].message = message;
+
+    await product.save();
+
+    return res.status(200).json({
+      message: "Review has been successfully edited, moderators will verify the edited message first",
+      userReview: product.reviews
+    });
+  } catch (error) {
+    console.error(`Error: ${error}`);
+    return res.status(500).send('Internal Server Error');
+  };
+};
+
+// [SECTION - STRECTH - Ratings] Admin reviews rating and sets showReview to true
+export async function reviewRating(req,res) {
+  console.log('This is reviewRating function');
+  const { userId, showReview } = req.body
+  try {
+    const product = await Product.findById(req.params.productId)
+    if (!product) {
+      return res.status(404).json({
+        error: 'Product not found',
+        message: 'There is no product registered with that id'
+      });
+    };
+
+    const userIdReviewIndex = product.reviews.findIndex(review => review.userId === userId);
+    console.log('User review found at index:', userIdReviewIndex);
+
+    if (userIdReviewIndex === -1) {
+      console.log('No user review found');
+      return res.status(204).json({ message: "Product has not been reviewed by the user yet" });
+    };
+
+    // Extra validation if the user input is boolean
+    if (typeof showReview !== 'boolean') {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Invalid value for showReview. Please provide a boolean.',
+      });
+    };
+
+    // Admin updates the specific review if it will Show the review or not by setting showReview as true or false
+    product.reviews[userIdReviewIndex].showReview = showReview;
+
+    await product.save();
+
+    return res.status(200).json({
+      message: "You have successfully reviewed the message and the review will now show",
+      userReview: product.reviews
+    });
+  } catch (error) {
+    console.error(`Error: ${error}`);
+    return res.status(500).send('Internal Server Error');
+  };
+};
+
+// [SECTION - STRECTH - Ratings] Admin GETS ALL PRODUCTS REVIEWS
+export async function getAllReviews(req,res) {
+  console.log('This is getAllReviews function');
+  try {
+    const allReviews = await Product.findById(req.params.productId)
+
+  } catch (error) {
+    
+  };
+};
 
 export default getAllProducts;
 

@@ -29,6 +29,8 @@ Add Goal
     >>> Admin update order
     >>> Update User profile
     >>> Change User password
+    > User feedback
+    > User product review
     > Reset user password (Admin)?????
     > Add email
 
