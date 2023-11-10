@@ -1,3 +1,4 @@
+Group 1 Prefix b2
 Capstone Min Reqs
     >>> User Registration FIRST
     >>> User authentication

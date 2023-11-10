@@ -239,8 +239,8 @@ export async function userAddReview(req,res) {
   try {
     const userBoughtProduct = await Order.find({ userId: req.user.id });
     if (userBoughtProduct.length === 0) {
-      console.log(`Status 204 user has not bought product`)
-      return res.status(204).json({
+      console.log(`Status 404 user has not bought product`)
+      return res.status(404).json({
         error: 'User not found in orders',
         message: "User has not bought this product"
       });
@@ -367,7 +367,7 @@ export async function reviewRating(req,res) {
 export async function getAllReviews(req,res) {
   console.log('This is getAllReviews function');
   try {
-    const allReviews = await Product.findById(req.params.productId)
+    const allReviews = await Product.find(req.params.productId)
 
   } catch (error) {
     

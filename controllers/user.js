@@ -10,14 +10,11 @@ import { createAccessToken } from '../auth.js';
 
 // [SECTION] Admin GETS all users
 export async function getAllUsers (req, res){
+    console.log('This is getAllUsers function');
     try{
-        const allUsers = await User.find();
+        const allUsers = await User.find({}, { password: 0 });
         if(allUsers == null){
             return ('No users registered')
-        };
-        // Will loop on allUsers hiding their passwords
-        for(let user of allUsers){
-            user.password = "";
         };
         return res.status(200).send(allUsers);   
 
@@ -111,16 +108,14 @@ export async function getProfile(req, res){
         return res.status(401).json({error: 'Unauthorized - Incorrect token'});
     };
     try {
-        const userProfile = await User.findById(req.user.id)
+        const userProfile = await User.findById(req.user.id, {password: 0} )
         if (!userProfile) {
           return res.status(404).json({
             error: 'Not found',
             message: 'There is no user with that information'
           });
-        } else {
-        userProfile.password = "";
+        } ;
         return res.status(200).send(userProfile);
-        }
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -135,20 +130,19 @@ export async function updateProfile(req, res) {
     };
     const {id, isAdmin, password, orderedProducts, ...updates} = req.body
     try {
-        const userProfile = await User.findByIdAndUpdate(req.user.id, updates, {new: true});
+        const userProfile = await User.findByIdAndUpdate(req.user.id, updates, {new: true, fields: {password: 0}});
 
         if (!userProfile) {
             return res.status(404).json({
                 error: 'No user found',
                 message: 'User profile update failed'
             });
-        } else {
-        userProfile.password = "";
+        };
+
         return res.status(200).json({
             message: "User profile successfully updated",
             userProfile: userProfile
         });
-    }
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -415,7 +409,7 @@ export async function getUserOrders(req, res) {
 export async function setAdmin(req, res) {
     console.log('This is setAdmin function')
     try {
-        const userToAdmin = await User.findById(req.params.id);
+        const userToAdmin = await User.findById(req.params.id, {password: 0});
         if (!userToAdmin) {
             return res.status(404).json({
                 error: 'No user found',
@@ -433,9 +427,9 @@ export async function setAdmin(req, res) {
         const setUserAdmin = await User.findByIdAndUpdate(
             req.body.id, 
             { isAdmin: true}, 
-            {new: true});
+            {new: true, fields: {password: 0}});
         
-        setUserAdmin.password = "";
+        // setUserAdmin.password = "";
         return res.status(200).json({
             message: 'User has been set as an admin',
             user: setUserAdmin
