@@ -15,7 +15,10 @@ export async function getAllUsers (req, res){
         if(allUsers == null){
             return ('No users registered')
         };
-
+        // Will loop on allUsers hiding their passwords
+        for(let user of allUsers){
+            user.password = "";
+        };
         return res.status(200).send(allUsers);   
 
     } catch (error) {
@@ -349,14 +352,19 @@ export async function userCheckout(req, res) {
             orderStatus: 'pending'
         });
 
-        // Save the order
-        const savedOrder = await newOrder.save();
-
-        // Update product quantities in MongoDB
+       // Update product quantities in MongoDB
         for (const item of itemsInCart) {
             const product = await Product.findById(item.productId);
             if (product) {
-                // Decrease the quantity in the MongoDB
+                if (item.quantity > product.quantity) {
+                // If user's cart quantity is greater than available quantity
+                    return res.status(400).json({
+                        error: 'Insufficient Quantity',
+                        message: `Not enough quantity available for product with ID ${item.productId}`
+                    });
+                };
+
+                // If product.quantity has sufficient quantity > Decrease the quantity in the MongoDB
                 product.quantity -= item.quantity;
                 await product.save();
             };
