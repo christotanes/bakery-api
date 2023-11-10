@@ -63,20 +63,19 @@ const userSchema = new mongoose.Schema({
     ],
     totalAmount: {
       type: Number,
-      required: [true, 'Total Amount is Required']
+      default: 0
     },
   },
-  feedback: [
-    {
-      message: {
-        type: String,
-        required: [true, 'Feedback Message is Required']
-      },
-      adminReply: {
-        type: String
-      }
+  feedback: {
+    message: {
+      type: String,
+      default: ""
+    },
+    showFeedback: {
+      type: Boolean,
+      default: false
     }
-  ],
+  },
   createdOn: {
     type: Date,
     default: new Date()

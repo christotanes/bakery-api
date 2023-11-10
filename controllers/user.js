@@ -24,47 +24,29 @@ export async function getAllUsers (req, res){
     }
 };
 
-// [SECTION] Register New User
-// export async function registerUser(req, res){
-//     console.log(req.body)
-//     try {
-//         const emailExists = await User.findOne({ email: req.body.email });
-//         if (emailExists) {
-//                 return res.status(409).json({
-//                     error: 'Conflict',
-//                     message: 'Email has already been used or registered.'
-//                 })
-//             } else {
-//                 const newUser = new User({
-//                     email: req.body.email,
-//                     password: bcrypt.hashSync(req.body.password, 10),
-//                 });
-            
-//                 const savedUser = await newUser.save();
+// // [SECTION] Get Register
+export async function showRegisterPage(req, res) {
+    console.log('This is showRegisterPage function')
+    return res.render("register.ejs")
+};
 
-//                 return res.status(201).json({
-//                   message: 'User was successfully registered!',
-//                   product: savedUser,
-//                 });
-//             }
-//         } catch (error) {
-//             console.error('Error:', error);
-//             res.status(500).send('Internal Server Error');
-//         }
-//     }
+// [SECTION] Register User
 export async function registerUser(req, res) {
-    console.log('This is registerUser function');
-    const newUser = new User({
-        email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 10),
-    });
+    console.log(`This is registerUser function and this is the req.body: ${req.body.email} and ${req.body.password}`);
+    if (!req.body) {
+        return res.render('register.ejs');
+    };
 
     try {
+        const newUser = new User({
+            email: req.body.email,
+            password: bcrypt.hashSync(req.body.password, 10),
+        });
         const savedUser = await newUser.save();
 
-        return res.status(201).json({
+        return res.status(201).render('register.ejs', {
             message: 'User was successfully registered!',
-            user: savedUser,
+            user: savedUser
         });
     } catch (saveError) {
         if (saveError.name === 'MongoError' && saveError.code === 11000) {
@@ -475,12 +457,12 @@ export async function getFeedback(req, res) {
             });
         };
         
-        if (user.feedback.length === 0){
+        if (!user.feedback){
             return res.status(204).json({ message: 'User has not posted any feedback'});
         };
 
         return res.status(200).json({
-            message: "These is the feedback of the user",
+            message: "This is the feedback of the user",
             userFeedback: user.feedback
         });
     } catch (error) {
@@ -492,21 +474,23 @@ export async function getFeedback(req, res) {
 // [SECTION - FEEDBACK - STRETCH] User adds/posts feedback
 export async function addFeedback(req, res) {
     console.log('This is the addFeedback function');
+    const { message } = req.body
     try {
-        const user = await User.find({ userId: req.user.id });
-        if (user.length === 0) {
-            console.log(`Status 404 user has not bought product`)
+        const user = await User.findById(req.user.id, {password: 0});
+        if (!user) {
             return res.status(404).json({
                 error: 'User not found in Users',
-                message: "User has not bought this product"
+                message: "There is no user registered with that id"
             });
         };
 
-        await product.save();
+        const checkUserBought = await Order.find({})
 
+        user.feedback.message = message;
+        await user.save();
         return res.status(200).json({
-            message: "Review has been successfully added, moderators will verify the message first",
-            userFeedback: product.reviews
+            message: "Feedback has been successfully added, we will get back to you!",
+            userFeedback: user.feedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -517,21 +501,20 @@ export async function addFeedback(req, res) {
 // [SECTION - FEEDBACK - STRETCH] User edits feedback
 export async function editFeedback(req, res) {
     console.log('This is the editFeedback function');
+    const { message, id } = req.body
     try {
-        const user = await User.find({ userId: req.user.id });
-        if (user.length === 0) {
-            console.log(`Status 404 user has not bought product`)
+        const user = await User.findById(req.user.id, {password: 0});
+        if (!user) {
             return res.status(404).json({
-                error: 'User not found in Users',
-                message: "User has not bought this product"
+                error: 'User not found',
+                message: "There is no user registered with that id"
             });
         };
-
-        await product.save();
-
+        user.feedback.message = message
+        await user.save();
         return res.status(200).json({
-            message: "Review has been successfully added, moderators will verify the message first",
-            userFeedback: product.reviews
+            message: "Feedback has been successfully edited, we will get back to you",
+            userFeedback: user.feedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -539,24 +522,23 @@ export async function editFeedback(req, res) {
     };
 };
 
-// [SECTION - FEEDBACK - STRETCH] Admin replies on the feedback
-export async function replyFeedback(req, res) {
-    console.log('This is the replyFeedback function');
+// [SECTION - FEEDBACK - STRETCH] Admin sets feedback to be shown on testimonials
+export async function showFeedback(req, res) {
+    console.log('This is the showFeedback function');
+    const { id, showFeedback } = req.body
     try {
-        const user = await User.find({ userId: req.user.id });
-        if (user.length === 0) {
-            console.log(`Status 404 user has not bought product`)
+        const user = await User.findById(id, {password: 0});
+        if (!user) {
             return res.status(404).json({
-                error: 'User not found in Users',
-                message: "User has not bought this product"
+                error: 'User not found',
+                message: "There is no user registered with this id"
             });
         };
-
-        await product.save();
-
+        user.feedback.showFeedback = showFeedback;
+        await user.save();
         return res.status(200).json({
-            message: "Review has been successfully added, moderators will verify the message first",
-            userFeedback: product.reviews
+            message: "You have successfully updated the status of the feedback",
+            userFeedback: userFeedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -568,20 +550,16 @@ export async function replyFeedback(req, res) {
 export async function getAllFeedback(req, res) {
     console.log('This is the getAllFeedback function');
     try {
-        const user = await User.find({ userId: req.user.id });
-        if (user.length === 0) {
-            console.log(`Status 404 user has not bought product`)
+        const allFeedback = await User.find({ feedback: 1 });
+        if (allFeedback.length === 0) {
             return res.status(404).json({
-                error: 'User not found in Users',
-                message: "User has not bought this product"
+                error: 'No feedback found',
+                message: "There are no feedbacks by any user yet"
             });
         };
-
-        await product.save();
-
         return res.status(200).json({
             message: "Review has been successfully added, moderators will verify the message first",
-            userFeedback: product.reviews
+            userFeedback: allFeedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
