@@ -53,6 +53,7 @@ export async function getAllUsers (req, res){
 //         }
 //     }
 export async function registerUser(req, res) {
+    console.log('This is registerUser function');
     const newUser = new User({
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 10),
@@ -442,7 +443,7 @@ export async function setAdmin(req, res) {
 
 // [SECTION - ADMIN - STRETCH] Retrieve all orders
 export async function getAllOrders(req, res) {
-    console.log(`This is GET ALL ORDERS in USER.JS ${req.user.id}`)
+    console.log(`This is getAllOrders function`)
     try {
         const allOrders = await Order.find({});
         if (!allOrders) {

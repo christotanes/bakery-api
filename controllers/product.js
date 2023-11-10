@@ -9,18 +9,21 @@ import Order from '../models/Order.js';
 
 // [SECTION] Get All Products
 export async function getAllProducts(req, res) {
-  console.log('This is createProduct function');
+  console.log('This is getAllProducts function');
   try {
-    const allProducts = await Product.find({});
+      const allProducts = await Product.find({});
 
-    if (!allProducts.length) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'No products found'
-      });
-    }
+      if (!allProducts.length) {
+        return res.status(404).json({
+          error: 'Not Found',
+          message: 'No products found'
+        });
+      }
 
-    return res.status(200).json(allProducts);
+    return res.render('index.ejs', {
+      message: 'These are all the products',
+      allProducts: allProducts
+    });
   } catch (error) {
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');

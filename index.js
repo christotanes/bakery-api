@@ -5,6 +5,7 @@ import cors from 'cors';
 import productRoute from './routes/product.js';
 import userRoute from './routes/user.js';
 import orderRoute from './routes/order.js';
+import { getAllProducts } from './controllers/product.js';
 
 const app = express();
 const port = 4000;
@@ -24,12 +25,12 @@ app.use(express.json());
 app.use('/users', userRoute);
 app.use('/products', productRoute);
 app.use('/orders', orderRoute);
+app.get('/', getAllProducts);
 
 // Listen to the port
-if (import.meta.main) {
-    app.listen(process.env.PORT || port, () => {
+app.listen(process.env.PORT || port, () => {
         console.log(`API is now online on port ${process.env.PORT || port}`);
-    });
-};
+});
+
 
 export {app, mongoose};

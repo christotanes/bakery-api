@@ -4,6 +4,7 @@ import Order from '../models/Order.js';
 
 // [SECTION - ADMIN - ADDGOAL] Admin get specific order by Id
 export async function getOrderById(req, res) {
+    console.log('This is getOrderById function');
     try {
         const order = await Order.findById(req.params.orderId);
         if (!order) {
@@ -25,6 +26,7 @@ export async function getOrderById(req, res) {
 
 // [SECTION - ADMIN - ADDGOAL] Admin update order
 export async function updateOrder(req,res) {
+    console.log('This is updateOrder function');
     const {id, userId, ...updates} = req.body
     try {
         const orderToUpdate = await Order.findById(req.params.orderId);
