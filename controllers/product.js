@@ -237,18 +237,29 @@ export async function getAllProductReviews(req,res) {
 export async function userAddReview(req,res) {
   console.log('This is userAddReview function');
   try {
-    const userBoughtProduct = await Order.find({ userId: req.user.id});
-    if (!userBoughtProduct) {
+    const userBoughtProduct = await Order.find({ userId: req.user.id });
+    if (userBoughtProduct.length === 0) {
+      console.log(`Status 204 user has not bought product`)
       return res.status(204).json({
         error: 'User not found in orders',
         message: "User has not bought this product"
       });
     };
+
     const product = await Product.findById(req.params.productId)
     if (!product) {
       return res.status(404).json({
         error: 'Product not found',
         message: 'There is no product registered with that id'
+      });
+    };
+
+    // Check if the user has already posted a review for this product
+    const existingReview = product.reviews.find(review => review.userId === req.user.id);
+    if (existingReview) {
+      return res.status(400).json({
+        error: 'Review already exists',
+        message: 'User has already posted a review for this product'
       });
     };
 
