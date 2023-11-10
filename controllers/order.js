@@ -2,28 +2,6 @@ console.log("Hello world from controllers/order.js");
 import express from 'express';
 import Order from '../models/Order.js';
 
-// [SECTION - ADMIN - STRETCH] Retrieve all orders
-export async function getAllOrders(req, res) {
-    console.log(`This is GET ALL ORDERS in USER.JS ${req.user.id}`)
-    try {
-        const allOrders = await Order.find({});
-        if (!allOrders) {
-            return res.status(204).json({
-                error: 'No orders found',
-                message: 'There are no orders pending or completed registered yet'
-            });
-        };
-
-        return res.status(200).json({
-            message: 'These are all the pending and completed orders',
-            allOrders: allOrders
-        })
-    } catch (error) {
-        console.error(`Error: ${error}`);
-        return res.status(500).send('Internal Server Error')
-    };
-};
-
 // [SECTION - ADMIN - ADDGOAL] Admin get specific order by Id
 export async function getOrderById(req, res) {
     try {
@@ -76,5 +54,4 @@ export async function updateOrder(req,res) {
     };
 };
 
-
-export default getAllOrders;
+export default getOrderById;

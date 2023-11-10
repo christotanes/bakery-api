@@ -438,4 +438,26 @@ export async function setAdmin(req, res) {
     };
 };
 
+// [SECTION - ADMIN - STRETCH] Retrieve all orders
+export async function getAllOrders(req, res) {
+    console.log(`This is GET ALL ORDERS in USER.JS ${req.user.id}`)
+    try {
+        const allOrders = await Order.find({});
+        if (!allOrders) {
+            return res.status(204).json({
+                error: 'No orders found',
+                message: 'There are no orders pending or completed registered yet'
+            });
+        };
+
+        return res.status(200).json({
+            message: 'These are all the pending and completed orders',
+            allOrders: allOrders
+        })
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error')
+    };
+};
+
 export default getAllUsers;
