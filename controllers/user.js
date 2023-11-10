@@ -466,20 +466,21 @@ export async function getAllOrders(req, res) {
 export async function getFeedback(req, res) {
     console.log('This is the getFeedback function');
     try {
-        const userBoughtProduct = await Order.find({ userId: req.user.id });
-        if (userBoughtProduct.length === 0) {
-            console.log(`Status 404 user has not bought product`)
+        const user = await User.findById(req.user.id, { password: 0});
+        if (!user) {
             return res.status(404).json({
-                error: 'User not found in orders',
-                message: "User has not bought this product"
+                error: 'User not found in Users',
+                message: "User has not yet registered"
             });
         };
-
-        await product.save();
+        
+        if (user.feedback.length === 0){
+            return res.status(204).json({ message: 'User has not posted any feedback'});
+        };
 
         return res.status(200).json({
-            message: "Review has been successfully added, moderators will verify the message first",
-            userReview: product.reviews
+            message: "These is the feedback of the user",
+            userFeedback: user.feedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -491,11 +492,11 @@ export async function getFeedback(req, res) {
 export async function addFeedback(req, res) {
     console.log('This is the addFeedback function');
     try {
-        const userBoughtProduct = await Order.find({ userId: req.user.id });
-        if (userBoughtProduct.length === 0) {
+        const user = await User.find({ userId: req.user.id });
+        if (user.length === 0) {
             console.log(`Status 404 user has not bought product`)
             return res.status(404).json({
-                error: 'User not found in orders',
+                error: 'User not found in Users',
                 message: "User has not bought this product"
             });
         };
@@ -504,7 +505,7 @@ export async function addFeedback(req, res) {
 
         return res.status(200).json({
             message: "Review has been successfully added, moderators will verify the message first",
-            userReview: product.reviews
+            userFeedback: product.reviews
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -516,11 +517,11 @@ export async function addFeedback(req, res) {
 export async function editFeedback(req, res) {
     console.log('This is the editFeedback function');
     try {
-        const userBoughtProduct = await Order.find({ userId: req.user.id });
-        if (userBoughtProduct.length === 0) {
+        const user = await User.find({ userId: req.user.id });
+        if (user.length === 0) {
             console.log(`Status 404 user has not bought product`)
             return res.status(404).json({
-                error: 'User not found in orders',
+                error: 'User not found in Users',
                 message: "User has not bought this product"
             });
         };
@@ -529,7 +530,7 @@ export async function editFeedback(req, res) {
 
         return res.status(200).json({
             message: "Review has been successfully added, moderators will verify the message first",
-            userReview: product.reviews
+            userFeedback: product.reviews
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -541,11 +542,11 @@ export async function editFeedback(req, res) {
 export async function replyFeedback(req, res) {
     console.log('This is the replyFeedback function');
     try {
-        const userBoughtProduct = await Order.find({ userId: req.user.id });
-        if (userBoughtProduct.length === 0) {
+        const user = await User.find({ userId: req.user.id });
+        if (user.length === 0) {
             console.log(`Status 404 user has not bought product`)
             return res.status(404).json({
-                error: 'User not found in orders',
+                error: 'User not found in Users',
                 message: "User has not bought this product"
             });
         };
@@ -554,7 +555,7 @@ export async function replyFeedback(req, res) {
 
         return res.status(200).json({
             message: "Review has been successfully added, moderators will verify the message first",
-            userReview: product.reviews
+            userFeedback: product.reviews
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -566,11 +567,11 @@ export async function replyFeedback(req, res) {
 export async function getAllFeedback(req, res) {
     console.log('This is the getAllFeedback function');
     try {
-        const userBoughtProduct = await Order.find({ userId: req.user.id });
-        if (userBoughtProduct.length === 0) {
+        const user = await User.find({ userId: req.user.id });
+        if (user.length === 0) {
             console.log(`Status 404 user has not bought product`)
             return res.status(404).json({
-                error: 'User not found in orders',
+                error: 'User not found in Users',
                 message: "User has not bought this product"
             });
         };
@@ -579,7 +580,7 @@ export async function getAllFeedback(req, res) {
 
         return res.status(200).json({
             message: "Review has been successfully added, moderators will verify the message first",
-            userReview: product.reviews
+            userFeedback: product.reviews
         });
     } catch (error) {
         console.error(`Error: ${error}`);

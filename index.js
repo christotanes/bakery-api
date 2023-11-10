@@ -26,7 +26,10 @@ app.use('/products', productRoute);
 app.use('/orders', orderRoute);
 
 // Listen to the port
-
-app.listen(port, () => console.log(`Server running at port ${port}`))
+if (import.meta.main) {
+    app.listen(process.env.PORT || port, () => {
+        console.log(`API is now online on port ${process.env.PORT || port}`);
+    });
+};
 
 export {app, mongoose};
