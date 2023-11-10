@@ -7,6 +7,7 @@ const secret = "AparriBakerySecrets";
 
 // [SECTION] Token Creation
 export function createAccessToken(user){
+    console.log('This is createAccessToken function')
     const data = {
         id: user.id,
         email: user.email,
@@ -17,6 +18,7 @@ export function createAccessToken(user){
 
 export function verify (req, res, next) {
     console.log(req.headers.authorization);
+    console.log('This is verify function')
     let token = req.headers.authorization;
 
     if(typeof token == 'undefined'){
@@ -39,6 +41,7 @@ export function verify (req, res, next) {
 };
 
 export function verifyAdmin (req, res, next){
+    console.log('This is verifyAdmin function')
     if(req.user.isAdmin){
         next();
     } else {

@@ -1,28 +1,32 @@
 console.log("Hello world from routes/user.js");
 import express from 'express';
-import { getAllUsers, registerUser, login, getProfile, updateProfile, changePassword, viewCart, addProductToCart, editCart, userCheckout, getOrders, setAdmin  } from '../controllers/user.js';
+import { getAllUsers, registerUser, login, getProfile, updateProfile, changePassword, viewCart, addProductToCart, editCart, userCheckout, getUserOrders, setAdmin  } from '../controllers/user.js';
 import {verify, verifyAdmin} from '../auth.js'
 
 const router = express.Router();
 
-router.get("/", verify, verifyAdmin, getAllUsers)
-router.post("/register", registerUser);
-router.post("/login", login);
+router.get("/:id/userDetails", verify, getProfile);
+router.patch("/:id/setAdmin", verify, verifyAdmin, setAdmin);
 
 router.route("/:id")
     .get(verify, getProfile)
     .put(verify, updateProfile)
     .patch(verify, changePassword);
 
-router.route("/:id/cart")
+router.route("/cart")
     .get(verify, viewCart)
     .post(verify, addProductToCart)
     .patch(verify, editCart);
 
-router.post("/:id/checkout", verify, userCheckout);
-router.get("/:id/orders", verify, getOrders);
+router.post("/checkout", verify, userCheckout);
+router.get("/myOrders", verify, getUserOrders);
 
-router.patch("/setAdmin", verify, verifyAdmin, setAdmin);
+router.get("/", verify, verifyAdmin, getAllUsers)
+router.post("/register", registerUser);
+router.post("/login", login);
+
+// Keep the other routes at the end
+
 
 export default router
 

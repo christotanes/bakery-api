@@ -5,6 +5,7 @@ import { verify, verifyAdmin } from '../auth.js';
 
 const router = express.Router();
 
+// STRECTH GOALS /orders/ route
 router.get("/", verify, verifyAdmin, getAllOrders);
 router.route('/:orderId')
         .get(verify, verifyAdmin, getOrderById)

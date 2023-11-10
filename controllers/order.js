@@ -4,6 +4,7 @@ import Order from '../models/Order.js';
 
 // [SECTION - ADMIN - STRETCH] Retrieve all orders
 export async function getAllOrders(req, res) {
+    console.log(`This is GET ALL ORDERS in USER.JS ${req.user.id}`)
     try {
         const allOrders = await Order.find({});
         if (!allOrders) {

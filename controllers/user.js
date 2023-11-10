@@ -7,14 +7,14 @@ import Order from '../models/Order.js';
 import { createAccessToken } from '../auth.js';
 // import cheerio from 'cheerio';
 // import axios from 'axios';
-    
+
 // [SECTION] Admin GETS all users
 export async function getAllUsers (req, res){
     try{
         const allUsers = await User.find();
         if(allUsers == null){
             return ('No users registered')
-        }
+        };
 
         return res.status(200).send(allUsers);   
 
@@ -22,7 +22,7 @@ export async function getAllUsers (req, res){
         console.log(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
     }
-}
+};
 
 // [SECTION] Register New User
 // export async function registerUser(req, res){
@@ -54,33 +54,33 @@ export async function getAllUsers (req, res){
 //     }
 export async function registerUser(req, res) {
     const newUser = new User({
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 10),
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 10),
     });
-  
+
     try {
-      const savedUser = await newUser.save();
-  
-      return res.status(201).json({
-        message: 'User was successfully registered!',
-        user: savedUser,
-      });
+        const savedUser = await newUser.save();
+
+        return res.status(201).json({
+            message: 'User was successfully registered!',
+            user: savedUser,
+        });
     } catch (saveError) {
-      if (saveError.name === 'MongoError' && saveError.code === 11000) {
+        if (saveError.name === 'MongoError' && saveError.code === 11000) {
         // Unique constraint violation (duplicate email)
         return res.status(409).json({
-          error: 'Conflict',
-          message: 'Email has already been used or registered.',
-        });
-      }
-  
-      console.error(`Error during user save: ${saveError}`);
-      return res.status(500).send('Internal Server Error');
-    }
-  }
+            error: 'Conflict',
+            message: 'Email has already been used or registered.',
+            });
+        }
+        console.error(`Error during user save: ${saveError}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
 
 // [SECTION] User Logins
 export async function login(req, res){
+    console.log('This is login function')
     try{
         const user = await User.findOne({ email: req.body.email});
         // console.log(user)
@@ -103,6 +103,7 @@ export async function login(req, res){
 
 // [SECTION] User retrieves profile details
 export async function getProfile(req, res){
+    console.log('This is getprofile function')
     if (req.params.id !== req.user.id) {
         return res.status(401).json({error: 'Unauthorized - Incorrect token'});
     };
@@ -113,8 +114,10 @@ export async function getProfile(req, res){
             error: 'Not found',
             message: 'There is no user with that information'
           });
-        };
+        } else {
+        userProfile.password = "";
         return res.status(200).send(userProfile);
+        }
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -123,6 +126,7 @@ export async function getProfile(req, res){
 
 // [SECTION - NOT INCLUDED] User updates profile
 export async function updateProfile(req, res) {
+    console.log('This is updateProfile function')
     if (req.params.id !== req.user.id) {
         return res.status(401).json({error: 'Unauthorized - Incorrect token'});
     };
@@ -135,12 +139,13 @@ export async function updateProfile(req, res) {
                 error: 'No user found',
                 message: 'User profile update failed'
             });
-        };
-
+        } else {
+        userProfile.password = "";
         return res.status(200).json({
             message: "User profile successfully updated",
             userProfile: userProfile
         });
+    }
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -149,6 +154,7 @@ export async function updateProfile(req, res) {
 
 // [SECTION - ADDGOAL] Change password
 export async function changePassword(req, res) {
+    console.log('This is changePassword function')
     if (req.params.id !== req.user.id) {
         return res.status(401).json({ error: 'Unauthorized - Incorrect token' });
     };
@@ -183,9 +189,7 @@ export async function changePassword(req, res) {
 
 // [SECTION - CART - ADDGOAL] User retrieves/views cart
 export async function viewCart(req, res) {
-    if (req.params.id !== req.user.id) {
-        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
-    };
+    console.log('This is viewCart function')
     try {
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -211,9 +215,7 @@ export async function viewCart(req, res) {
 
 // [SECTION - STRETCH - CART] Add to cart
 export async function addProductToCart(req, res) {
-    if (req.params.id !== req.user.id) {
-        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
-    };
+    console.log('This is addProductToCart function')
     try {
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -265,67 +267,63 @@ export async function addProductToCart(req, res) {
 
 // [SECTION - STRETCH - CART] Change product quantities and CAN REMOVE PRODUCTS just have to set input button when user clicks remove set Quantity in req.body.quantity to be 0
 export async function editCart(req, res) {
-    if (req.params.id !== req.user.id) {
-        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
-    };
+    console.log('This is editCart function')
     try {
-      const user = await User.findById(req.user.id);
-      if (!user) {
-        return res.status(404).json({
-          error: 'Not found',
-          message: 'User not found',
-        });
-      };
-  
-      const { productId, quantity } = req.body;
-  
-      // Check if the product exists in the cart
-      const existingProductIndex = user.cart.products.findIndex(
-        (product) => product.productId === productId
-      );
-  
-      if (existingProductIndex !== -1) {
-        if (quantity === 0) {
-          // If quantity is 0, remove the product from the cart
-          user.cart.products.splice(existingProductIndex, 1);
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+            error: 'Not found',
+            message: 'User not found',
+            });
+        };
+
+        const { productId, quantity } = req.body;
+
+        // Check if the product exists in the cart
+        const existingProductIndex = user.cart.products.findIndex(
+            (product) => product.productId === productId
+        );
+
+        if (existingProductIndex !== -1) {
+            if (quantity === 0) {
+            // If quantity is 0, remove the product from the cart
+            user.cart.products.splice(existingProductIndex, 1);
+            } else {
+            // If the product exists, update its quantity and recalculate the subtotal
+            user.cart.products[existingProductIndex].quantity = quantity;
+            user.cart.products[existingProductIndex].subTotal = user.cart.products[existingProductIndex].price * quantity;
+            }
         } else {
-          // If the product exists, update its quantity and recalculate the subtotal
-          user.cart.products[existingProductIndex].quantity = quantity;
-          user.cart.products[existingProductIndex].subTotal = user.cart.products[existingProductIndex].price * quantity;
+            return res.status(404).json({
+            error: 'Not found',
+            message: 'Product not found in the cart',
+            });
         }
-      } else {
-        return res.status(404).json({
-          error: 'Not found',
-          message: 'Product not found in the cart',
+
+        // Recalculate total amount based on the updated cart
+        const totalAmount = user.cart.products.reduce(
+            (total, product) => total + product.subTotal,
+            0
+        );
+
+        // Update totalAmount in the cart
+        user.cart.totalAmount = totalAmount;
+    
+        await user.save();
+
+        return res.status(200).json({
+            message: 'Product quantity updated successfully!',
+            cart: user.cart,
         });
-      }
-  
-      // Recalculate total amount based on the updated cart
-      const totalAmount = user.cart.products.reduce(
-        (total, product) => total + product.subTotal,
-        0
-      );
-  
-      // Update totalAmount in the cart
-      user.cart.totalAmount = totalAmount;
-  
-      await user.save();
-  
-      return res.status(200).json({
-        message: 'Product quantity updated successfully!',
-        cart: user.cart,
-      });
     } catch (error) {
-      console.error(`Error: ${error}`);
-      return res.status(500).send('Internal Server Error');
-    }
-}
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error');
+    };
+};
 
 // [SECTION] User checkout with Cart added
 export async function userCheckout(req, res) {
-    if (req.params.id !== req.user.id) {
-        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
-    };
+    console.log('This is userCheckout function')
     try {
     // Find user
         const user = await User.findById(req.user.id);
@@ -384,10 +382,8 @@ export async function userCheckout(req, res) {
 };
 
 // [SECTION - STRETCH] Retrieve user's orders
-export async function getOrders(req, res) {
-    if (req.params.id !== req.user.id) {
-        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
-    };
+export async function getUserOrders(req, res) {
+    console.log('This is getUserOrders function')
     try {
         const userOrders = await Order.find({userId: req.user.id});
         if (!userOrders) {
@@ -409,8 +405,9 @@ export async function getOrders(req, res) {
 
 // [SECTION - ADMIN - STRETCH] Set User as Admin
 export async function setAdmin(req, res) {
+    console.log('This is setAdmin function')
     try {
-        const userToAdmin = await User.findById(req.body.id);
+        const userToAdmin = await User.findById(req.params.id);
         if (!userToAdmin) {
             return res.status(404).json({
                 error: 'No user found',
@@ -430,6 +427,7 @@ export async function setAdmin(req, res) {
             { isAdmin: true}, 
             {new: true});
         
+        setUserAdmin.password = "";
         return res.status(200).json({
             message: 'User has been set as an admin',
             user: setUserAdmin
