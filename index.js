@@ -8,7 +8,7 @@ import orderRoute from './routes/order.js';
 import { getAllProducts } from './controllers/product.js';
 
 const app = express();
-const port = 4000;
+const port = 3000;
 
 mongoose.connect("mongodb+srv://admin:admin@zuitt-bootcamp.3qeebta.mongodb.net/bakerycapstone?retryWrites=true&w=majority");
 
