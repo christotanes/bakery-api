@@ -61,26 +61,10 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  reviews: [
-    {
-      userId: {
-        type: String,
-        required: [true, 'userId is Required']
-      },
-      rating: {
-        type: Number,
-        enum: [1, 2, 3, 4, 5],
-        required: [true, 'Number Rating is Required']
-      },
-      message: {
-        type: String
-      },
-      showReview: {
-        type: Boolean,
-        default: false
-      }
-    }
-  ],
+  img:{
+    type: String,
+    required: [true, 'Product Image URL is Required' ]
+  },
   createdOn: {
     type: Date,
     default: new Date()

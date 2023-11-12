@@ -40,42 +40,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  cart: {
-    products: [
-      {
-        productId: {
-          type: String,
-          required: [true, 'Product ID is required']
-        },
-        quantity: {
-          type: Number,
-          required: [true, 'Quantity is Required']
-        },
-        price: {
-          type: Number,
-          required: [true, 'Price is Required']
-        },
-        subTotal: {
-          type: Number,
-          required: [true, 'Subtotal is Required']
-        },
-      },
-    ],
-    totalAmount: {
-      type: Number,
-      default: 0
-    },
-  },
-  feedback: {
-    message: {
-      type: String,
-      default: ""
-    },
-    showFeedback: {
-      type: Boolean,
-      default: false
-    }
-  },
   createdOn: {
     type: Date,
     default: new Date()

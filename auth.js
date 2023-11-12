@@ -2,8 +2,11 @@
 import jwt from 'jsonwebtoken';
 // const jwt = require('jsonwebtoken');
 
+import * as dotenv from 'dotenv'
+dotenv.config();
+
 // [SECTION] Secret Keyword
-const secret = "AparriBakerySecrets";
+const secret = process.env.SECRET_KEY;
 
 // [SECTION] Token Creation
 export function createAccessToken(user){

@@ -6,11 +6,17 @@ import productRoute from './routes/product.js';
 import userRoute from './routes/user.js';
 import orderRoute from './routes/order.js';
 import { getAllProducts } from './controllers/product.js';
+import * as dotenv from 'dotenv'
+dotenv.config();
 
 const app = express();
-const port = 3000;
 
-mongoose.connect("mongodb+srv://admin:admin@zuitt-bootcamp.3qeebta.mongodb.net/bakerycapstone?retryWrites=true&w=majority");
+const mongoUser = process.env.MONGO_USER;
+const mongoPassword = process.env.MONGO_PASSWORD;
+const mongoHost = process.env.MONGO_HOST;
+const mongoDB = process.env.MONGO_DB;
+
+mongoose.connect(`mongodb+srv://${mongoUser}:${mongoPassword}@${mongoHost}/${mongoDB}`);
 
 // Will check connection
 let db = mongoose.connection;
@@ -31,6 +37,5 @@ app.get('/', getAllProducts);
 app.listen(process.env.PORT || port, () => {
         console.log(`API is now online on port ${process.env.PORT || port}`);
 });
-
 
 export {app, mongoose};
