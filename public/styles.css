@@ -26,7 +26,39 @@
     }
 }
 
+@keyframes fade-out-left {
+    0% {
+        display: flex;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%);
+        display: none;
+    }
+}
+
+@keyframes move-left {
+    0% {
+        display: flex;
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes fade-in-from-right {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+        display: flex;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 .featuredProducts {
-    animation: appear 10s infinite ease;
+    /* animation: appear 10s infinite ease; */
     width: 18rem;
 }

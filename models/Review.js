@@ -3,6 +3,10 @@ import { mongoose } from "mongoose";
 
 // JSON schema for Review
 const reviewSchema = new mongoose.Schema({
+  productId: {
+    type: String,
+    required: [true, 'ProductId is Required']
+  },
   reviews: [
     {
       userId: {

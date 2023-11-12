@@ -5,6 +5,8 @@ import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import { createAccessToken } from '../auth.js';
+import Cart from '../models/Cart.js';
+import Feedback from '../models/Feedback.js';
 // import cheerio from 'cheerio';
 // import axios from 'axios';
 
@@ -100,10 +102,10 @@ export async function getProfile(req, res){
     try {
         const userProfile = await User.findById(req.user.id, {password: 0} )
         if (!userProfile) {
-          return res.status(404).json({
-            error: 'Not found',
-            message: 'There is no user with that information'
-          });
+            return res.status(404).json({
+                error: 'Not found',
+                message: 'There is no user with that information'
+            });
         } ;
         return res.status(200).send(userProfile);
     } catch (error) {
@@ -178,21 +180,21 @@ export async function changePassword(req, res) {
 export async function viewCart(req, res) {
     console.log('This is viewCart function')
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) {
+        const userCart = await Cart.findById(req.user.id);
+        if (!userCart) {
             return res.status(404).json({
                 error: 'No file found',
-                message: 'There is no user with that id'
+                message: 'There is no userCart with that id'
             });
         };
 
-        if (!user.cart || user.cart.products.length === 0) {
+        if (!userCart || userCart.products.length === 0) {
             return res.status(204).send('Your cart has no contents');
         };
 
         return res.status(200).json({
             message: "Here are the contents of your cart",
-            cart: user.cart
+            cart: userCart
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -204,8 +206,8 @@ export async function viewCart(req, res) {
 export async function addProductToCart(req, res) {
     console.log('This is addProductToCart function')
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) {
+        const userCart = await Cart.findById(req.user.id);
+        if (!userCart) {
         return res.status(404).json({
             error: 'Not found',
             message: 'User not found'
@@ -221,30 +223,30 @@ export async function addProductToCart(req, res) {
         };
     
         // Check if the product already exists in the cart
-        const existingProductIndex = user.cart.products.findIndex(
+        const existingProductIndex = userCart.products.findIndex(
         (product) => product.productId === newProduct.productId
         );
 
         if (existingProductIndex !== -1) {
         // If the product exists, update its quantity and subTotal
-            user.cart.products[existingProductIndex].quantity += newProduct.quantity;
-            user.cart.products[existingProductIndex].subTotal += newProduct.subTotal;
+            userCart.products[existingProductIndex].quantity += newProduct.quantity;
+            userCart.products[existingProductIndex].subTotal += newProduct.subTotal;
         } else {
         // If the product is new, add it to the cart
-            user.cart.products.push(newProduct);
+            userCart.products.push(newProduct);
         };
 
         // Recalculate total amount based on the updated cart
-        const totalAmount = user.cart.products.reduce((total, product) => total + product.subTotal, 0);
+        const totalAmount = userCart.products.reduce((total, product) => total + product.subTotal, 0);
 
         // Update totalAmount in the cart
-        user.cart.totalAmount = totalAmount;
+        userCart.totalAmount = totalAmount;
 
-        await user.save();
+        await userCart.save();
 
         return res.status(200).json({
         message: 'Product added to the cart successfully!',
-        cart: user.cart
+        cart: userCart
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -256,8 +258,8 @@ export async function addProductToCart(req, res) {
 export async function editCart(req, res) {
     console.log('This is editCart function')
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) {
+        const userCart = await Cart.findById(req.user.id);
+        if (!userCart) {
             return res.status(404).json({
             error: 'Not found',
             message: 'User not found',
@@ -267,18 +269,18 @@ export async function editCart(req, res) {
         const { productId, quantity } = req.body;
 
         // Check if the product exists in the cart
-        const existingProductIndex = user.cart.products.findIndex(
+        const existingProductIndex = userCart.products.findIndex(
             (product) => product.productId === productId
         );
 
         if (existingProductIndex !== -1) {
             if (quantity === 0) {
             // If quantity is 0, remove the product from the cart
-            user.cart.products.splice(existingProductIndex, 1);
+            userCart.products.splice(existingProductIndex, 1);
             } else {
             // If the product exists, update its quantity and recalculate the subtotal
-            user.cart.products[existingProductIndex].quantity = quantity;
-            user.cart.products[existingProductIndex].subTotal = user.cart.products[existingProductIndex].price * quantity;
+            userCart.products[existingProductIndex].quantity = quantity;
+            userCart.products[existingProductIndex].subTotal = userCart.products[existingProductIndex].price * quantity;
             }
         } else {
             return res.status(404).json({
@@ -288,19 +290,19 @@ export async function editCart(req, res) {
         }
 
         // Recalculate total amount based on the updated cart
-        const totalAmount = user.cart.products.reduce(
+        const totalAmount = userCart.products.reduce(
             (total, product) => total + product.subTotal,
             0
         );
 
         // Update totalAmount in the cart
-        user.cart.totalAmount = totalAmount;
+        user.totalAmount = totalAmount;
     
-        await user.save();
+        await userCart.save();
 
         return res.status(200).json({
             message: 'Product quantity updated successfully!',
-            cart: user.cart,
+            cart: userCart
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -313,8 +315,8 @@ export async function userCheckout(req, res) {
     console.log('This is userCheckout function')
     try {
     // Find user
-        const user = await User.findById(req.user.id);
-        if (!user) {
+        const userCart = await Cart.findById(req.user.id);
+        if (!userCart) {
             return res.status(404).json({
             error: 'Not found',
             message: 'There is no user with that information'
@@ -322,7 +324,7 @@ export async function userCheckout(req, res) {
         };
 
         // Prepare purchased items
-        const itemsInCart = user.cart.products.map(product => ({
+        const itemsInCart = userCart.products.map(product => ({
             productId: product.productId,
             quantity: product.quantity
         }));
@@ -355,12 +357,12 @@ export async function userCheckout(req, res) {
         };
 
         // Clear user's cart
-        user.cart = {
+        userCart = {
             products: [],
             totalAmount: 0
         };
 
-        await user.save();
+        await userCart.save();
 
         return res.status(200).json({
             message: 'You have successfully purchased these products!',
@@ -456,21 +458,17 @@ export async function getAllOrders(req, res) {
 export async function getFeedback(req, res) {
     console.log('This is the getFeedback function');
     try {
-        const user = await User.findById(req.user.id, { password: 0});
-        if (!user) {
+        const feedback = await Feedback.findById(req.user.id);
+        if (!feedback) {
             return res.status(404).json({
-                error: 'User not found in Users',
-                message: "User has not yet registered"
+                error: 'Feedback not found',
+                message: "User has not yet registered a feedback"
             });
-        };
-        
-        if (!user.feedback){
-            return res.status(204).json({ message: 'User has not posted any feedback'});
         };
 
         return res.status(200).json({
             message: "This is the feedback of the user",
-            userFeedback: user.feedback
+            feedback: feedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -481,23 +479,33 @@ export async function getFeedback(req, res) {
 // [SECTION - FEEDBACK - STRETCH] User adds/posts feedback
 export async function addFeedback(req, res) {
     console.log('This is the addFeedback function');
-    const { message } = req.body
+    const { message, userId } = req.body
     try {
-        const user = await User.findById(req.user.id, {password: 0});
-        if (!user) {
+        const feedback = await Feedback.findById(req.user.id);
+        if (!feedback) {
             return res.status(404).json({
-                error: 'User not found in Users',
-                message: "There is no user registered with that id"
+                error: 'Feedback not found',
+                message: "User has not added a feedback"
             });
         };
 
-        const checkUserBought = await Order.find({})
+        const checkUserBought = await Order.find({ userId: req.user.id});
+        if(!checkUserBought){
+            return res.status(400).json({
+                error: "User has not bought",
+                message: "User has not bought any items yet"
+            })
+        }
 
-        user.feedback.message = message;
-        await user.save();
+        feedback = {
+            message: message,
+            userId: userId
+        };
+        
+        await feedback.save();
         return res.status(200).json({
             message: "Feedback has been successfully added, we will get back to you!",
-            userFeedback: user.feedback
+            feedback: feedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -510,18 +518,18 @@ export async function editFeedback(req, res) {
     console.log('This is the editFeedback function');
     const { message, id } = req.body
     try {
-        const user = await User.findById(req.user.id, {password: 0});
-        if (!user) {
+        const feedback = await Feedback.findById(req.user.id);
+        if (!feedback) {
             return res.status(404).json({
-                error: 'User not found',
-                message: "There is no user registered with that id"
+                error: 'Feedback not found',
+                message: "There is no feedback registered with that id"
             });
         };
-        user.feedback.message = message
-        await user.save();
+        feedback.message = message
+        await feedback.save();
         return res.status(200).json({
             message: "Feedback has been successfully edited, we will get back to you",
-            userFeedback: user.feedback
+            feedback: feedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -534,18 +542,18 @@ export async function showFeedback(req, res) {
     console.log('This is the showFeedback function');
     const { id, showFeedback } = req.body
     try {
-        const user = await User.findById(id, {password: 0});
-        if (!user) {
+        const feedback = await Feedback.findById(id);
+        if (!feedback) {
             return res.status(404).json({
-                error: 'User not found',
-                message: "There is no user registered with this id"
+                error: 'Feedback not found',
+                message: "There is no feedback registered with this id"
             });
         };
-        user.feedback.showFeedback = showFeedback;
-        await user.save();
+        feedback.showFeedback = showFeedback;
+        await feedback.save();
         return res.status(200).json({
             message: "You have successfully updated the status of the feedback",
-            userFeedback: userFeedback
+            feedback: feedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -557,7 +565,7 @@ export async function showFeedback(req, res) {
 export async function getAllFeedback(req, res) {
     console.log('This is the getAllFeedback function');
     try {
-        const allFeedback = await User.find({ feedback: 1 });
+        const allFeedback = await Feedback.find({});
         if (allFeedback.length === 0) {
             return res.status(404).json({
                 error: 'No feedback found',
@@ -566,7 +574,7 @@ export async function getAllFeedback(req, res) {
         };
         return res.status(200).json({
             message: "Review has been successfully added, moderators will verify the message first",
-            userFeedback: allFeedback
+            feedback: allFeedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);

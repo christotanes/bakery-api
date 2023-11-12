@@ -17,7 +17,7 @@ function showSlides() {
     }
   }
   
-  slideIndex += 3;
+  slideIndex ++;
   
   // Reset slideIndex if it exceeds the number of slides
   if (slideIndex >= slides.length) {
@@ -26,4 +26,3 @@ function showSlides() {
   
   setTimeout(showSlides, 10000); // Change image every 10 seconds
 }
-

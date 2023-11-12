@@ -3,31 +3,37 @@ import { mongoose } from "mongoose";
 
 // JSON schema for (placeholder = TaskSchema)
 const cartSchema = new mongoose.Schema({
-    cart: {
-        products: [
+    userId: {
+        type: String,
+        required: [true, 'User ID is required']
+    },
+    products: [
         {
             productId: {
-            type: String,
-            required: [true, 'Product ID is required']
+                type: String,
+                required: [true, 'Product ID is required']
             },
             quantity: {
-            type: Number,
-            required: [true, 'Quantity is Required']
+                type: Number,
+                required: [true, 'Quantity is Required']
             },
             price: {
-            type: Number,
-            required: [true, 'Price is Required']
+                type: Number,
+                required: [true, 'Price is Required']
             },
             subTotal: {
-            type: Number,
-            required: [true, 'Subtotal is Required']
+                type: Number,
+                required: [true, 'Subtotal is Required']
             },
-        },
-        ],
-        totalAmount: {
+            productAddedOn: {
+                type: Date,
+                default: new Date()
+            }
+        }
+    ],
+    totalAmount: {
         type: Number,
         default: 0
-        },
     },
     createdOn: {
         type: Date,
