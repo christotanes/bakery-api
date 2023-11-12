@@ -36,10 +36,10 @@ Add Goal
     > Add email
 
 TO DO
-    > change feedback functions in controllers/user.js to use Feedback model
-    > change ratings functions in controllers/product.js to use Rating model
-    > change cart functions in controllers/user.js to use cart model
-    > setup cookies Authorization: `Bearer ${}`
+    >>> change feedback functions in controllers/user.js to use Feedback model
+    >>> change ratings functions in controllers/product.js to use Rating model
+    >>> change cart functions in controllers/user.js to use cart model
+    >>> setup cookies Authorization: `Bearer ${}`
 
 Bakery Project
 > Start FE of capstone

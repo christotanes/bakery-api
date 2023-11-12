@@ -33,7 +33,7 @@ app.use('/products', productRoute);
 app.use('/orders', orderRoute);
 app.get('/', getAllProducts);
 
-// Listen to the port
+// Listen to the port   
 app.listen(process.env.PORT || port, () => {
         console.log(`API is now online on port ${process.env.PORT || port}`);
 });
