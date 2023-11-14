@@ -333,7 +333,7 @@ export async function userCheckout(req, res) {
         const newOrder = new Order({
             userId: req.user.id,
             products: itemsInCart,
-            totalAmount: user.cart.totalAmount,
+            totalAmount: userCart.totalAmount,
             paymentInfo: req.body.paymentInfo,
             orderStatus: 'pending'
         });

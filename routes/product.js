@@ -23,14 +23,3 @@ router.get('/active', verify, verifyAdmin, activeProducts);
 router.get('/allReviews', verify, verifyAdmin, getAllReviews);
 
 export default router
-
-// [SECTION] Dependencies & Modules
-// const express = require('express');
-// const functionName = require('../controllers/controller');
-// // [SECTION] Routing Component
-// const router = express.Router();
-
-// const auth = require("../auth");
-// const { verify, verifyAdmin } = auth;
-// // [SECTION] Expert Route System
-// module.exports = router;

@@ -1,5 +1,4 @@
 console.log("Hello world from controllers/product.js");
-import express from 'express';
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import Review from '../models/Review.js';
@@ -56,7 +55,8 @@ export async function createProduct (req, res){
                 deliveryAvailable: req.body.deliveryAvailable,
                 flavors: req.body.flavors,
                 bestBefore: req.body.bestBefore,
-                vegetarian: req.body.vegetarian
+                vegetarian: req.body.vegetarian,
+                img: req.body.img
             });
     
             const savedProduct = await newProduct.save();

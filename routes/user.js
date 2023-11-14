@@ -26,11 +26,11 @@ router.get("/orders", verify, verifyAdmin, getAllOrders);
 router.get("/", verify, verifyAdmin, getAllUsers);
 
 router.route("/register")
-    .get(showRegisterPage)
+    .get(showRegisterPage) //notneeded
     .post(registerUser);
 
-    router.route('/login')
-    .get(showLoginPage)
+router.route('/login')
+    .get(showLoginPage) //notneeded
     .post(login);
 
 router.route("/feedback")
