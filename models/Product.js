@@ -65,6 +65,16 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Product Image URL is Required' ]
   },
+  imgLqip:{
+    type: String,
+    required: [true, 'Product Image URL is Required' ]
+  },
+  imgBanner:{
+    type: String
+  },
+  imgBannerLqip:{
+    type: String
+  },
   createdOn: {
     type: Date,
     default: new Date()
