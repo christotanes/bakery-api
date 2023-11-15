@@ -38,13 +38,6 @@ export async function updateOrder(req,res) {
 
         const updateOrder = await Order.findByIdAndUpdate(req.params.orderId, updates, { new: true});
 
-        if (!updateOrder) {
-            return res.status(500).json({
-                error: 'Internal Server Error',
-                message: 'Failed to update the order',
-            });
-        };
-
         return res.status(200).json({
             message: 'Order was successfully updated',
             order: updateOrder

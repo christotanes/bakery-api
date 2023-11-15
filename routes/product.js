@@ -17,9 +17,11 @@ router.route('/:productId')
         .get(getProductById)
         .put(verify, verifyAdmin, updateProduct);
 
-// router.get("/", getAllProducts) Have to reconfigure this so that its not using getAllProducts
-router.post("/createProduct", verify, verifyAdmin, createProduct);
-router.get('/active', verify, verifyAdmin, activeProducts);
+router.route('/')
+        .get(verify, verifyAdmin, activeProducts)
+        .post(verify, verifyAdmin, createProduct)
+
+router.get('/all', getAllProducts)
 router.get('/allReviews', verify, verifyAdmin, getAllReviews);
 
 export default router

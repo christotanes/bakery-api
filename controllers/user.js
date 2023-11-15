@@ -1,5 +1,5 @@
 console.log("Hello world from controllers/user.js");
-import express from 'express';
+
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
@@ -24,18 +24,6 @@ export async function getAllUsers (req, res){
         console.log(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
     }
-};
-
-// [SECTION] Get Register
-export async function showRegisterPage(req, res) {
-    console.log('This is showRegisterPage function')
-    return res.render("register.ejs")
-};
-
-// [SECTION] Get login
-export async function showLoginPage(req, res) {
-    console.log('This is showLoginPage function')
-    return res.render("login.ejs")
 };
 
 // [SECTION] Register User
@@ -296,7 +284,7 @@ export async function editCart(req, res) {
         );
 
         // Update totalAmount in the cart
-        user.totalAmount = totalAmount;
+        userCart.totalAmount = totalAmount;
     
         await userCart.save();
 
@@ -362,12 +350,11 @@ export async function userCheckout(req, res) {
             totalAmount: 0
         };
 
-        await userCart.save();
+        await newOrder.save();
 
         return res.status(200).json({
             message: 'You have successfully purchased these products!',
-            purchasedInfo: itemsInCart,
-            orderInfo: savedOrder
+            orderInfo: newOrder
     });
     } catch (error) {
         console.error(`Error: ${error}`);

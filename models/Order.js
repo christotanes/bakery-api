@@ -16,6 +16,10 @@ const orderSchema = new mongoose.Schema({
             quantity: {
                 type: Number,
                 required: [true, 'Quantity is Required']
+            },
+            addedOn: {
+                type: Date,
+                default: new Date()
             }
         }
     ],

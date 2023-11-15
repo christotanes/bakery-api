@@ -3,11 +3,6 @@ import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import Review from '../models/Review.js';
 
-// import bcrypt from 'bcrypt';
-// import cheerio from 'cheerio';
-// import axios from 'axios';
-// import auth from '../auth.js';
-
 // [SECTION] Get All Products
 export async function getAllProducts(req, res) {
   console.log('This is getAllProducts function');
@@ -56,7 +51,10 @@ export async function createProduct (req, res){
                 flavors: req.body.flavors,
                 bestBefore: req.body.bestBefore,
                 vegetarian: req.body.vegetarian,
-                img: req.body.img
+                img: req.body.img,
+                imgLqip: req.body.imgLqip,
+                imgBanner: req.body.imgBanner,
+                imgBannerLqip: req.body.imgBannerLqip
             });
     
             const savedProduct = await newProduct.save();
@@ -238,18 +236,26 @@ export async function getAllProductReviews(req,res) {
   };
 };
 
-// [SECTION - STRECTH - Ratings] User add's review
+// [SECTION - STRECTH - Ratings] User adds review
 export async function userAddReview(req,res) {
   console.log('This is userAddReview function');
   try {
     const userBoughtProduct = await Order.find({ userId: req.user.id });
-    if (userBoughtProduct.length === 0) { //Need to refactor condition as it only checks UserId in Order.js needs to check if the products bought was same productId
-      console.log(`Status 404 user has not bought product`)
+    if (userBoughtProduct.length === 0) { 
       return res.status(404).json({
         error: 'User not found in orders',
         message: "User has not bought this product"
       });
     };
+
+    userBoughtProduct.products.forEach(product => {
+      if (req.params.productId !== product.productId){
+        return res.status(400).json({
+          error: 'Product not found in Order',
+          message: 'User has not bought a product with this Id'
+        });
+      }
+    });
 
     const product = await Product.findById(req.params.productId)
     if (!product) {
@@ -262,7 +268,7 @@ export async function userAddReview(req,res) {
     // Check if the user has already posted a review for this product
     const existingReview = await Review.findById(req.params.productId);
     existingReview.reviews.forEach(review => {
-      if (req.user.id !== userId){
+      if (req.user.id !== review.userId){
         return res.status(400).json({
           error: 'Review already exists',
           message: 'User has already posted a review for this product'
@@ -276,14 +282,25 @@ export async function userAddReview(req,res) {
       message: req.body.message
     };
 
-    existingReview.productId = product.productId;
-    existingReview.review.push(userReview);
-    await existingReview.save();
-
-    return res.status(200).json({
-      message: "Review has been successfully added, moderators will verify the message first",
-      userReview: product.reviews
-    });
+    if (existingReview){
+      existingReview.reviews.push(userReview);
+      await existingReview.save()
+      return res.status(200).json({
+        message: "Review has been successfully added, moderators will verify the message first",
+        userReview: existingReview
+      });
+    } else {
+      const newReview = new Review({
+        productId: req.params.productId,
+        reviews: userReview
+      })
+      newReview.reviews.push(userReview);
+      await newReview.save();
+      return res.status(200).json({
+        message: "Review has been successfully added, moderators will verify the message first",
+        userReview: newReview
+      });
+    }
   } catch (error) {
     console.error(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -348,14 +365,6 @@ export async function reviewRating(req,res) {
       return res.status(204).json({ message: "Product has not been reviewed by the user yet" });
     };
 
-    // Extra validation if the user input is boolean
-    if (typeof showReview !== 'boolean') {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: 'Invalid value for showReview. Please provide a boolean.',
-      });
-    };
-
     // Admin updates the specific review if it will Show the review or not by setting showReview as true or false
     review.reviews[userIdReviewIndex].showReview = showReview;
 
@@ -387,11 +396,4 @@ export async function getAllReviews(req,res) {
   };
 };
 
-// [SECTION - Reviews for specific productId]
-
 export default getAllProducts;
-
-// // [SECTION] Dependencies & Modules
-// const TaskName = require('../models/model');
-// const bcrypt = require('bcrypt');
-// const auth = require('../auth');
