@@ -3,7 +3,6 @@ import Order from '../models/Order.js';
 
 // [SECTION - ADMIN - ADDGOAL] Admin get specific order by Id
 export async function getOrderById(req, res) {
-    console.log('This is getOrderById function');
     try {
         const order = await Order.findById(req.params.orderId);
         if (!order) {
@@ -25,7 +24,6 @@ export async function getOrderById(req, res) {
 
 // [SECTION - ADMIN - ADDGOAL] Admin update order
 export async function updateOrder(req,res) {
-    console.log('This is updateOrder function');
     const {id, userId, ...updates} = req.body
     try {
         const orderToUpdate = await Order.findById(req.params.orderId);
@@ -45,6 +43,28 @@ export async function updateOrder(req,res) {
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
+    };
+};
+
+// [SECTION - ADMIN - STRETCH] Retrieve all orders
+export async function getAllOrders(req, res) {
+    console.log(`This is GET ALL ORDERS in USER.JS ${req.user.id}`)
+    try {
+        const allOrders = await Order.find({});
+        if (!allOrders) {
+            return res.status(204).json({
+                error: 'No orders found',
+                message: 'There are no orders pending or completed registered yet'
+            });
+        };
+
+        return res.status(200).json({
+            message: 'These are all the pending and completed orders',
+            allOrders: allOrders
+        })
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send('Internal Server Error')
     };
 };
 

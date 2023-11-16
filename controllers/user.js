@@ -1,5 +1,4 @@
 console.log("Hello world from controllers/user.js");
-
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
@@ -18,6 +17,10 @@ export async function getAllUsers (req, res){
         if(allUsers == null){
             return ('No users registered')
         };
+        // Will loop on allUsers hiding their passwords
+        for(let user of allUsers){
+            user.password = "";
+        };
         return res.status(200).send(allUsers);   
 
     } catch (error) {
@@ -26,21 +29,21 @@ export async function getAllUsers (req, res){
     }
 };
 
-// [SECTION] Register User
+// [SECTION] Register New User
 export async function registerUser(req, res) {
-    console.log(`This is registerUser function and this is the req.body: ${req.body.email} and ${req.body.password}`);
-    if (!req.body) {
-        return res.render('register.ejs');
-    };
+    console.log(`This is registerUser function`);
+    const newUser = new User({
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 10),
+    });
 
     try {
-        const newUser = new User({
-            email: req.body.email,
-            password: bcrypt.hashSync(req.body.password, 10),
-        });
+        const savedUser = await newUser.save();
 
-        await newUser.save();
-        return res.redirect('./login');
+        return res.status(201).json({
+            message: 'User was successfully registered!',
+            user: savedUser,
+        });
     } catch (saveError) {
         if (saveError.name === 'MongoError' && saveError.code === 11000) {
         // Unique constraint violation (duplicate email)
@@ -66,11 +69,7 @@ export async function login(req, res){
             const isPasswordCorrect = bcrypt.compareSync(req.body.password, user.password);
 
             if(isPasswordCorrect){
-                return res.status(201).json({
-                    access: createAccessToken(user),
-                    redirect: '../products', // Include the redirect URL in the JSON response
-                });
-                // return res.status(201).send({ access: createAccessToken(user) }).redirect('./products');
+                return res.status(201).send({ access: createAccessToken(user) });
             } else {
                 return res.status(401).json({ error: 'Unauthorized - Incorrect password'});
             }
@@ -88,14 +87,16 @@ export async function getProfile(req, res){
         return res.status(401).json({error: 'Unauthorized - Incorrect token'});
     };
     try {
-        const userProfile = await User.findById(req.user.id, {password: 0} )
+        const userProfile = await User.findById(req.user.id, {password: 0})
         if (!userProfile) {
             return res.status(404).json({
                 error: 'Not found',
                 message: 'There is no user with that information'
             });
-        } ;
-        return res.status(200).send(userProfile);
+        } else {
+            userProfile.password = "";
+            return res.status(200).send(userProfile);
+        }
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -110,19 +111,20 @@ export async function updateProfile(req, res) {
     };
     const {id, isAdmin, password, orderedProducts, ...updates} = req.body
     try {
-        const userProfile = await User.findByIdAndUpdate(req.user.id, updates, {new: true, fields: {password: 0}});
+        const userProfile = await User.findByIdAndUpdate(req.user.id, updates, {new: true});
 
         if (!userProfile) {
             return res.status(404).json({
                 error: 'No user found',
                 message: 'User profile update failed'
             });
-        };
-
+        } else {
+        userProfile.password = "";
         return res.status(200).json({
             message: "User profile successfully updated",
             userProfile: userProfile
         });
+    }
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -190,52 +192,59 @@ export async function viewCart(req, res) {
     };
 };
 
+
 // [SECTION - STRETCH - CART] Add to cart
 export async function addProductToCart(req, res) {
     console.log('This is addProductToCart function')
+    const { productId, price, quantity } = req.body;
+    const newProduct = {
+        productId,
+        price,
+        quantity,
+        subTotal: price * quantity
+    };
+    let totalAmount;
     try {
-        const userCart = await Cart.findById(req.user.id);
-        if (!userCart) {
-        return res.status(404).json({
-            error: 'Not found',
-            message: 'User not found'
+        const userCart = await Cart.findOne({ userId: req.user.id });
+        if(userCart){
+            let newProductArray;
+            // Check if the product already exists in the cart
+            const existingProductIndex = userCart.products.findIndex(
+            (product) => product.productId === newProduct.productId
+            );
+
+            if (existingProductIndex !== -1) {
+            // If the product exists, update its quantity and subTotal
+                userCart.products[existingProductIndex].quantity += newProduct.quantity;
+                userCart.products[existingProductIndex].subTotal += newProduct.subTotal;
+            } else {
+            // If the product is new, add it to the cart
+                newProductArray = userCart.products.push(newProduct);
+            };
+            // Recalculate total amount based on the updated cart
+            totalAmount = userCart.products.reduce((total, product) => total + product.subTotal, 0);
+            // Update totalAmount in the cart
+            userCart.totalAmount = totalAmount;
+            await userCart.save();
+
+            return res.status(200).json({
+            message: 'Product added to the cart successfully!',
+            cart: userCart
             });
-        };
-
-        const { productId, price, quantity } = req.body;
-        const newProduct = {
-            productId,
-            price,
-            quantity,
-            subTotal: price * quantity
-        };
+        } else if(!userCart){
+            totalAmount = newProduct.subTotal;
+            let cart = new Cart({
+                userId: req.user.id,
+                products: [newProduct],
+                totalAmount: totalAmount
+            })
+            await cart.save();
     
-        // Check if the product already exists in the cart
-        const existingProductIndex = userCart.products.findIndex(
-        (product) => product.productId === newProduct.productId
-        );
-
-        if (existingProductIndex !== -1) {
-        // If the product exists, update its quantity and subTotal
-            userCart.products[existingProductIndex].quantity += newProduct.quantity;
-            userCart.products[existingProductIndex].subTotal += newProduct.subTotal;
-        } else {
-        // If the product is new, add it to the cart
-            userCart.products.push(newProduct);
-        };
-
-        // Recalculate total amount based on the updated cart
-        const totalAmount = userCart.products.reduce((total, product) => total + product.subTotal, 0);
-
-        // Update totalAmount in the cart
-        userCart.totalAmount = totalAmount;
-
-        await userCart.save();
-
-        return res.status(200).json({
-        message: 'Product added to the cart successfully!',
-        cart: userCart
-        });
+            return res.status(200).json({
+            message: 'Product added to the cart successfully!',
+            cart: cart
+            });
+        }
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -246,7 +255,7 @@ export async function addProductToCart(req, res) {
 export async function editCart(req, res) {
     console.log('This is editCart function')
     try {
-        const userCart = await Cart.findById(req.user.id);
+        const userCart = await Cart.findOne({ userId: req.user.id });
         if (!userCart) {
             return res.status(404).json({
             error: 'Not found',
@@ -303,7 +312,7 @@ export async function userCheckout(req, res) {
     console.log('This is userCheckout function')
     try {
     // Find user
-        const userCart = await Cart.findById(req.user.id);
+        let userCart = await Cart.findOne({ userId: req.user.id });
         if (!userCart) {
             return res.status(404).json({
             error: 'Not found',
@@ -325,33 +334,39 @@ export async function userCheckout(req, res) {
             paymentInfo: req.body.paymentInfo,
             orderStatus: 'pending'
         });
-
-       // Update product quantities in MongoDB
-        for (const item of itemsInCart) {
+        // Validation check if products in MongoDB has enough quantities
+        for (let item of itemsInCart) {
             const product = await Product.findById(item.productId);
             if (product) {
                 if (item.quantity > product.quantity) {
-                // If user's cart quantity is greater than available quantity
+                // Validation check if user's cart quantity is greater than available quantity
+                // console.log(`Not enough quantity`)
                     return res.status(400).json({
                         error: 'Insufficient Quantity',
                         message: `Not enough quantity available for product with ID ${item.productId}`
                     });
                 };
-
-                // If product.quantity has sufficient quantity > Decrease the quantity in the MongoDB
-                product.quantity -= item.quantity;
-                await product.save();
             };
         };
+        
+        
 
         // Clear user's cart
-        userCart = {
-            products: [],
-            totalAmount: 0
-        };
-
+        userCart.products = [];
+        userCart.totalAmount = 0;
+        
+        await userCart.save();
         await newOrder.save();
-
+        // console.log(`Order has been saved`)
+        // Since Order has been saved, its fine to decrease the quantities of the products in MongoDB
+        for (let item of itemsInCart) {
+            const product = await Product.findById(item.productId);
+            if (product) {
+                product.quantity -= item.quantity;
+                await product.save();
+                // console.log(`product has been saved`)
+                };
+            };
         return res.status(200).json({
             message: 'You have successfully purchased these products!',
             orderInfo: newOrder
@@ -385,10 +400,10 @@ export async function getUserOrders(req, res) {
 };
 
 // [SECTION - ADMIN - STRETCH] Set User as Admin
-export async function setAdmin(req, res) {
-    console.log('This is setAdmin function')
+export async function setAsAdmin(req, res) {
+    console.log('This is setAsAdmin function')
     try {
-        const userToAdmin = await User.findById(req.params.id, {password: 0});
+        const userToAdmin = await User.findById(req.params.id);
         if (!userToAdmin) {
             return res.status(404).json({
                 error: 'No user found',
@@ -404,11 +419,10 @@ export async function setAdmin(req, res) {
         };
 
         const setUserAdmin = await User.findByIdAndUpdate(
-            req.body.id, 
+            req.params.id, 
             { isAdmin: true}, 
-            {new: true, fields: {password: 0}});
-        
-        // setUserAdmin.password = "";
+            {new: true});
+
         return res.status(200).json({
             message: 'User has been set as an admin',
             user: setUserAdmin
@@ -419,33 +433,11 @@ export async function setAdmin(req, res) {
     };
 };
 
-// [SECTION - ADMIN - STRETCH] Retrieve all orders
-export async function getAllOrders(req, res) {
-    console.log(`This is getAllOrders function`)
-    try {
-        const allOrders = await Order.find({});
-        if (!allOrders) {
-            return res.status(204).json({
-                error: 'No orders found',
-                message: 'There are no orders pending or completed registered yet'
-            });
-        };
-
-        return res.status(200).json({
-            message: 'These are all the pending and completed orders',
-            allOrders: allOrders
-        })
-    } catch (error) {
-        console.error(`Error: ${error}`);
-        return res.status(500).send('Internal Server Error')
-    };
-};
-
 // [SECTION - FEEDBACK - STRETCH] User retrieves feedback
 export async function getFeedback(req, res) {
     console.log('This is the getFeedback function');
     try {
-        const feedback = await Feedback.findById(req.user.id);
+        const feedback = await Feedback.find({ userId: req.user.id });
         if (!feedback) {
             return res.status(404).json({
                 error: 'Feedback not found',
@@ -468,12 +460,12 @@ export async function addFeedback(req, res) {
     console.log('This is the addFeedback function');
     const { message, userId } = req.body
     try {
-        const feedback = await Feedback.findById(req.user.id);
-        if (!feedback) {
-            return res.status(404).json({
-                error: 'Feedback not found',
-                message: "User has not added a feedback"
-            });
+        const feedback = await Feedback.findOne({ userId: req.user.id });
+        if (feedback) {
+            return res.status(400).json({
+                error: "User has a duplicate feedback",
+                message: "User has already posted a feedback."
+            })
         };
 
         const checkUserBought = await Order.find({ userId: req.user.id});
@@ -484,15 +476,15 @@ export async function addFeedback(req, res) {
             })
         }
 
-        feedback = {
-            message: message,
-            userId: userId
-        };
+        const newFeedback = new Feedback({
+            userId: req.user.id,
+            message: req.body.message
+        });
         
-        await feedback.save();
+        await newFeedback.save();
         return res.status(200).json({
             message: "Feedback has been successfully added, we will get back to you!",
-            feedback: feedback
+            feedback: newFeedback
         });
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -505,7 +497,7 @@ export async function editFeedback(req, res) {
     console.log('This is the editFeedback function');
     const { message, id } = req.body
     try {
-        const feedback = await Feedback.findById(req.user.id);
+        const feedback = await Feedback.findOne({ userId: req.user.id });
         if (!feedback) {
             return res.status(404).json({
                 error: 'Feedback not found',
@@ -527,9 +519,9 @@ export async function editFeedback(req, res) {
 // [SECTION - FEEDBACK - STRETCH] Admin sets feedback to be shown on testimonials
 export async function showFeedback(req, res) {
     console.log('This is the showFeedback function');
-    const { id, showFeedback } = req.body
+    const { _id, showFeedback } = req.body
     try {
-        const feedback = await Feedback.findById(id);
+        const feedback = await Feedback.findById(_id);
         if (!feedback) {
             return res.status(404).json({
                 error: 'Feedback not found',
@@ -560,7 +552,7 @@ export async function getAllFeedback(req, res) {
             });
         };
         return res.status(200).json({
-            message: "Review has been successfully added, moderators will verify the message first",
+            message: "These are all the feedbacks",
             feedback: allFeedback
         });
     } catch (error) {
@@ -568,5 +560,6 @@ export async function getAllFeedback(req, res) {
         return res.status(500).send('Internal Server Error');
     };
 };
+
 
 export default getAllUsers;

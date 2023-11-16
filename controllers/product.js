@@ -7,19 +7,16 @@ import Review from '../models/Review.js';
 export async function getAllProducts(req, res) {
   console.log('This is getAllProducts function');
   try {
-      const allProducts = await Product.find({});
+    const allProducts = await Product.find({});
 
-      if (!allProducts.length) {
-        return res.status(404).json({
-          error: 'Not Found',
-          message: 'No products found'
-        });
-      }
+    if (!allProducts.length) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: 'No products found'
+      });
+    }
 
-    return res.render('index.ejs', {
-      message: 'These are all the products',
-      allProducts: allProducts
-    });
+    return res.status(200).json(allProducts);
   } catch (error) {
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -214,7 +211,7 @@ export async function activateProduct(req, res) {
 export async function getAllProductReviews(req,res) {
   console.log('This is getAllProductReviews function');
   try {
-    const allReviews = await Review.findById(req.params.productId)
+    const allReviews = await Review.findOne({productId: req.params.productId})
     if (!allReviews) {
       return res.status(404).json({
         error: 'Review not found',
@@ -239,12 +236,17 @@ export async function getAllProductReviews(req,res) {
 // [SECTION - STRECTH - Ratings] User adds review
 export async function userAddReview(req,res) {
   console.log('This is userAddReview function');
+  let userReview = {
+    userId: req.user.id,
+    rating: req.body.rating,
+    message: req.body.message
+  };
   try {
-    const userBoughtProduct = await Order.find({ userId: req.user.id });
-    if (userBoughtProduct.length === 0) { 
+    const userBoughtProduct = await Order.findOne({ userId: req.user.id });
+    if (userBoughtProduct.length === 0) {
       return res.status(404).json({
         error: 'User not found in orders',
-        message: "User has not bought this product"
+        message: "User has not bought any product"
       });
     };
 
@@ -266,35 +268,28 @@ export async function userAddReview(req,res) {
     };
 
     // Check if the user has already posted a review for this product
-    const existingReview = await Review.findById(req.params.productId);
-    existingReview.reviews.forEach(review => {
-      if (req.user.id !== review.userId){
+    const existingReview = await Review.findOne({productId: req.params.productId});
+    if (existingReview) {
+      const alreadyReviewed = existingReview.reviews.some(review => review.userId === req.user.id);
+      if (alreadyReviewed) {
         return res.status(400).json({
           error: 'Review already exists',
           message: 'User has already posted a review for this product'
         });
+      } else {
+        // Add new review and save
+        existingReview.reviews.push(userReview);
+        await existingReview.save();
+        return res.status(200).json({
+          message: "Review has been successfully added, moderators will verify the message first",
+          userReview: existingReview
+        });
       }
-    });
-
-    let userReview = {
-      userId: req.user.id,
-      rating: req.body.rating,
-      message: req.body.message
-    };
-
-    if (existingReview){
-      existingReview.reviews.push(userReview);
-      await existingReview.save()
-      return res.status(200).json({
-        message: "Review has been successfully added, moderators will verify the message first",
-        userReview: existingReview
-      });
     } else {
       const newReview = new Review({
         productId: req.params.productId,
-        reviews: userReview
+        reviews: [userReview]
       })
-      newReview.reviews.push(userReview);
       await newReview.save();
       return res.status(200).json({
         message: "Review has been successfully added, moderators will verify the message first",
@@ -312,7 +307,7 @@ export async function userEditReview(req,res) {
   console.log('This is userEditReview function');
   const { userId, showReview, rating, message } = req.body;
   try {
-    const review = await Review.findById(req.params.productId)
+    const review = await Review.findOne({productId: req.params.productId})
     if (!review) {
       return res.status(404).json({
         error: 'review not found',
@@ -320,7 +315,7 @@ export async function userEditReview(req,res) {
       });
     };
 
-    const userIdReviewIndex = Review.reviews.findIndex(review => review.userId === req.user.id);
+    const userIdReviewIndex = review.reviews.findIndex(review => review.userId === req.user.id);
     console.log('User review found at index:', userIdReviewIndex);
 
     if (userIdReviewIndex === -1) {
@@ -349,7 +344,7 @@ export async function reviewRating(req,res) {
   console.log('This is reviewRating function');
   const { userId, showReview } = req.body
   try {
-    const review = await Review.findById(req.params.productId)
+    const review = await Review.findOne({productId: req.params.productId})
     if (!review) {
       return res.status(404).json({
         error: 'review not found',
