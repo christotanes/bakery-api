@@ -40,6 +40,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  img: {
+    type: String
+  },
   createdOn: {
     type: Date,
     default: new Date()

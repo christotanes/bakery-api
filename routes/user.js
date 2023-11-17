@@ -25,7 +25,7 @@ router.route("/feedback")
 
 router.get("/feedback/all", verify, verifyAdmin, getAllFeedback);
 
-router.get("/:id/userDetails", verify, getProfile);
+router.get("/details", verify, getProfile);
 router.patch("/:id/setAsAdmin", verify, verifyAdmin, setAsAdmin);
 
 // .get(verify, getProfile)

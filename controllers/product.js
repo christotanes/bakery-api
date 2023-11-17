@@ -391,4 +391,31 @@ export async function getAllReviews(req,res) {
   };
 };
 
+// Search
+export async function searchProducts(req, res){
+    console.log('This is the searchProducts function');
+    try {
+        const query = {};
+
+        // Building the query dynamically based on provided search criteria
+        for (const key in req.query) {
+            if (req.query[key]) {
+                // Use regex for string fields for partial matching
+                query[key] = { $regex: req.query[key], $options: 'i' };
+            }
+        }
+
+        // If no search criteria are provided, you might want to handle it differently
+        if (Object.keys(query).length === 0) {
+            return res.status(400).send('Search criteria are required');
+        }
+
+        const products = await Product.find(query);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error in searching products:', error);
+        res.status(500).send('Internal Server Error');
+  }
+}
+
 export default getAllProducts;

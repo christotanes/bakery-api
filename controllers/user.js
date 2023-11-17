@@ -83,9 +83,6 @@ export async function login(req, res){
 // [SECTION] User retrieves profile details
 export async function getProfile(req, res){
     console.log('This is getprofile function')
-    if (req.params.id !== req.user.id) {
-        return res.status(401).json({error: 'Unauthorized - Incorrect token'});
-    };
     try {
         const userProfile = await User.findById(req.user.id, {password: 0})
         if (!userProfile) {
@@ -109,7 +106,7 @@ export async function updateProfile(req, res) {
     if (req.params.id !== req.user.id) {
         return res.status(401).json({error: 'Unauthorized - Incorrect token'});
     };
-    const {id, isAdmin, password, orderedProducts, ...updates} = req.body
+    const {id, isAdmin, password, ...updates} = req.body
     try {
         const userProfile = await User.findByIdAndUpdate(req.user.id, updates, {new: true});
 
