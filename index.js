@@ -5,18 +5,14 @@ import cors from 'cors';
 import productRoute from './routes/product.js';
 import userRoute from './routes/user.js';
 import orderRoute from './routes/order.js';
-import { getAllProducts } from './controllers/product.js';
-import * as dotenv from 'dotenv'
-dotenv.config();
+import cartRoute from './routes/cart.js';
+import feedbackRoute from './routes/feedback.js';
+import reviewRoute from './routes/review.js'
 
 const app = express();
+const port = 4002;
 
-const mongoUser = process.env.MONGO_USER;
-const mongoPassword = process.env.MONGO_PASSWORD;
-const mongoHost = process.env.MONGO_HOST;
-const mongoDB = process.env.MONGO_DB;
-
-mongoose.connect(`mongodb+srv://${mongoUser}:${mongoPassword}@${mongoHost}/${mongoDB}`);
+mongoose.connect("mongodb+srv://admin:admin@zuitt-bootcamp.3qeebta.mongodb.net/bakerycapstone?retryWrites=true&w=majority");
 
 // Will check connection
 let db = mongoose.connection;
@@ -26,16 +22,22 @@ db.on("open", () => console.log("Now connected to Bakery MongoDB"));
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 app.use(express.json());
+app.use(cors());
 
 // app.use('/', productRoute);
-app.use('/users', userRoute);
-app.use('/products', productRoute);
-app.use('/orders', orderRoute);
-app.get('/', getAllProducts);
+app.use('/b2/users', userRoute);
+app.use('/b2/products', productRoute);
+app.use('/b2/orders', orderRoute);
+app.use('/b2/cart', cartRoute);
+app.use('/b2/feedbacks', feedbackRoute);
+app.use('/b2/reviews', reviewRoute);
 
-// Listen to the port   
-app.listen(process.env.PORT || port, () => {
-        console.log(`API is now online on port ${process.env.PORT || port}`);
+// Listen to the port
+app.listen(port, () => {
+    console.log(`API is now online on port ${port}`);
 });
+
+
+// app.listen(port, () => console.log(`Server running at port ${port}`))
 
 export {app, mongoose};
