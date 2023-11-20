@@ -45,7 +45,8 @@ const productSchema = new mongoose.Schema({
     default: []
   },
   bestBefore: {
-    type: Number
+    type: Number,
+    default: 5
   },
   vegetarian: {
     type: Boolean,
