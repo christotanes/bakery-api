@@ -13,14 +13,12 @@ const productSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    lowercase: true,
-    enum: ['cake', 'bread'],
+    enum: ['Cake', 'Bread', 'Snack'],
     required: [true, 'Type of Product is Required']
   },
   size: {
     type: String,
-    lowercase: true,
-    enum: ['regular', 'medium', 'large'],
+    enum: ['Regular', 'Medium', 'Large'],
     required: [true, 'Size of Product is Reguired']
   },
   quantity: {
@@ -47,7 +45,7 @@ const productSchema = new mongoose.Schema({
     default: []
   },
   bestBefore: {
-    type: String
+    type: Number
   },
   vegetarian: {
     type: Boolean,
@@ -66,13 +64,16 @@ const productSchema = new mongoose.Schema({
     required: [true, 'Product Image URL is Required' ]
   },
   imgLqip:{
-    type: String
+    type: String,
+    required: [true, 'Product Image LQIP URL is Required' ]
   },
   imgBanner:{
-    type: String
+    type: String,
+    required: [true, 'Product Image Banner URL is Required' ]
   },
   imgBannerLqip:{
-    type: String
+    type: String,
+    required: [true, 'Product Image Banner LQIP URL is Required' ]
   },
   createdOn: {
     type: Date,
