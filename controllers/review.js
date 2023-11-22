@@ -16,13 +16,10 @@ export async function getAllProductReviews(req,res) {
         };
         
         if (allReviews.reviews.length === 0) {
-            return res.status(204).json({ message: "Product has not been reviewed yet" });
+            return res.status(204).send(false);
         };
     
-        return res.status(200).json({
-            message: "These are this product's reviews",
-            reviews: allReviews.reviews
-        });
+        return res.status(200).send(allReviews.reviews);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -76,10 +73,7 @@ export async function userAddReview(req,res) {
             // Add new review and save
             existingReview.reviews.push(userReview);
             await existingReview.save();
-            return res.status(200).json({
-                message: "Review has been successfully added, moderators will verify the message first",
-                userReview: existingReview
-            });
+            return res.status(200).send(existingReview);
         }
         } else {
         const newReview = new Review({
@@ -87,10 +81,7 @@ export async function userAddReview(req,res) {
             reviews: [userReview]
         })
         await newReview.save();
-        return res.status(200).json({
-            message: "Review has been successfully added, moderators will verify the message first",
-            userReview: newReview
-        });
+        return res.status(200).send(newReview);
     }
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -116,7 +107,7 @@ export async function userEditReview(req,res) {
 
         if (userIdReviewIndex === -1) {
             console.log('No user review found');
-            return res.status(204).json({ message: "Product has not been reviewed by the user yet" });
+            return res.status(204).send(false);
         };
 
         // Changes the rating and message of the specific review without letting the user change the userId and showReview
@@ -125,10 +116,7 @@ export async function userEditReview(req,res) {
 
         await review.save();
 
-        return res.status(200).json({
-            message: "Review has been successfully edited, moderators will verify the edited message first",
-            userReview: review.reviews[userIdReviewIndex]
-        });
+        return res.status(200).send(review.reviews[userIdReviewIndex]);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -153,7 +141,7 @@ export async function reviewRating(req,res) {
 
         if (userIdReviewIndex === -1) {
         console.log('No user review found');
-        return res.status(204).json({ message: "Product has not been reviewed by the user yet" });
+        return res.status(204).send(false);
         };
 
         // Admin updates the specific review if it will Show the review or not by setting showReview as true or false
@@ -161,10 +149,7 @@ export async function reviewRating(req,res) {
 
         await review.save();
 
-        return res.status(200).json({
-            message: "You have successfully reviewed the message and the review will now show",
-            userReview: review.reviews[userIdReviewIndex]
-        });
+        return res.status(200).send(review.reviews[userIdReviewIndex]);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -177,10 +162,7 @@ export async function getAllReviews(req,res) {
     try {
         const allReviews = await Review.find({})
     
-        return res.status(200).json({
-            message: "These are all the reviews for all the products",
-            allReviews: allReviews
-        })
+        return res.status(200).send(allReviews)
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');

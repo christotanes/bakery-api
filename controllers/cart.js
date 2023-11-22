@@ -1,12 +1,13 @@
 console.log("Hello world from controllers/cart.js");
 import Cart from "../models/Cart.js";
 import Product from "../models/Product.js";
+import Order from "../models/Order.js";
 
 // [SECTION - CART - ADDGOAL] User retrieves/views cart
 export async function viewCart(req, res) {
     console.log('This is viewCart function')
     try {
-        const userCart = await Cart.findById(req.user.id);
+        const userCart = await Cart.findOne({ userId: req.user.id });
         if (!userCart) {
             return res.status(404).json({
                 error: 'No file found',
@@ -15,13 +16,10 @@ export async function viewCart(req, res) {
         };
 
         if (!userCart || userCart.products.length === 0) {
-            return res.status(204).send('Your cart has no contents');
+            return res.status(204).send(false);
         };
 
-        return res.status(200).json({
-            message: "Here are the contents of your cart",
-            cart: userCart
-        });
+        return res.status(200).send(userCart);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -31,11 +29,14 @@ export async function viewCart(req, res) {
 // [SECTION - STRETCH - CART] Add to cart
 export async function addProductToCart(req, res) {
     console.log('This is addProductToCart function')
-    const { productId, price, quantity } = req.body;
+    const { productId, name, price, quantity, img, imgLqip } = req.body;
     const newProduct = {
         productId,
+        name,
         price,
         quantity,
+        img,
+        imgLqip,
         subTotal: price * quantity
     };
     let totalAmount;
@@ -62,10 +63,7 @@ export async function addProductToCart(req, res) {
             userCart.totalAmount = totalAmount;
             await userCart.save();
 
-            return res.status(200).json({
-            message: 'Product added to the cart successfully!',
-            cart: userCart
-            });
+            return res.status(200).send(userCart);
         } else if(!userCart){
             totalAmount = newProduct.subTotal;
             let cart = new Cart({
@@ -75,10 +73,7 @@ export async function addProductToCart(req, res) {
             })
             await cart.save();
     
-            return res.status(200).json({
-            message: 'Product added to the cart successfully!',
-            cart: cart
-            });
+            return res.status(200).send(cart);
         }
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -132,10 +127,7 @@ export async function editCart(req, res) {
     
         await userCart.save();
 
-        return res.status(200).json({
-            message: 'Product quantity updated successfully!',
-            cart: userCart
-        });
+        return res.status(200).send(userCart);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -158,7 +150,10 @@ export async function userCheckout(req, res) {
         // Prepare purchased items
         const itemsInCart = userCart.products.map(product => ({
             productId: product.productId,
-            quantity: product.quantity
+            name: product.name,
+            quantity: product.quantity,
+            price: product.price,
+            subTotal: product.subTotal
         }));
 
         // Create an order
@@ -200,10 +195,8 @@ export async function userCheckout(req, res) {
                 // console.log(`product has been saved`)
                 };
             };
-        return res.status(200).json({
-            message: 'You have successfully purchased these products!',
-            orderInfo: newOrder
-    });
+        return res.status(200).send(newOrder)
+        ;
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');

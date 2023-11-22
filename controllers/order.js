@@ -12,10 +12,7 @@ export async function getOrderById(req, res) {
             });
         };
 
-        return res.status(200).json({
-            message: 'These are the details of the order',
-            order: order
-        });
+        return res.status(200).send(order);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -36,10 +33,7 @@ export async function updateOrder(req,res) {
 
         const updateOrder = await Order.findByIdAndUpdate(req.params.orderId, updates, { new: true});
 
-        return res.status(200).json({
-            message: 'Order was successfully updated',
-            order: updateOrder
-        });
+        return res.status(200).send(updateOrder);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -52,16 +46,10 @@ export async function getAllOrders(req, res) {
     try {
         const allOrders = await Order.find({});
         if (!allOrders) {
-            return res.status(204).json({
-                error: 'No orders found',
-                message: 'There are no orders pending or completed registered yet'
-            });
+            return res.status(204).send(false);
         };
 
-        return res.status(200).json({
-            message: 'These are all the pending and completed orders',
-            allOrders: allOrders
-        })
+        return res.status(200).send(allOrders)
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error')

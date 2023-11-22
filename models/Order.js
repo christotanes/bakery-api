@@ -13,9 +13,21 @@ const orderSchema = new mongoose.Schema({
                 type: String,
                 required: [true, 'productId is Required']
             },
+            name: {
+                type: String,
+                required: [true, 'Product Name is Required']
+            },
             quantity: {
                 type: Number,
                 required: [true, 'Quantity is Required']
+            },
+            price: {
+                type: Number,
+                required: [true, 'Price is Required']
+            },
+            subTotal: {
+                type: Number,
+                required: [true, 'SubTotal is Required']
             },
             addedOn: {
                 type: Date,

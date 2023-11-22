@@ -14,7 +14,7 @@ export async function getAllProducts(req, res) {
       });
     }
 
-    return res.status(200).json(allProducts);
+    return res.status(200).send(allProducts);
   } catch (error) {
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -54,10 +54,7 @@ export async function createProduct (req, res){
     
             const savedProduct = await newProduct.save();
 
-            return res.status(201).json({
-                message: 'Product is successfully created!',
-                product: savedProduct
-            });
+            return res.status(201).send(savedProduct);
         }
       } catch (error) {
         console.log(`Error: ${error}`);
@@ -78,7 +75,7 @@ export async function activeProducts(req, res){
       });
     }
     
-    return res.status(200).json(activeProducts);
+    return res.status(200).send(activeProducts);
   } catch (error) {
       console.log(`Error: ${error}`);
       return res.status(500).send('Internal Server Error');
@@ -98,7 +95,7 @@ export async function getProductById(req, res){
         message: 'We do not have that product you are looking for'
       });
     } else if (singleProduct.isActive == false){
-      return res.send('That product is currently unavailable right now');
+      return res.send(false);
     }
     
     return res.status(200).send(singleProduct);
@@ -123,10 +120,7 @@ export async function updateProduct(req, res) {
       });
     };
 
-    return res.status(200).json({
-      message: 'Product is successfully updated!',
-      product: productToUpdate
-    });
+    return res.status(200).send(productToUpdate);
   } catch (error) {
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -147,10 +141,7 @@ export async function archiveProduct(req, res) {
     }
 
     if (productToArchive.isActive === false) {
-      return res.status(200).json({
-        message: 'Product is already archived',
-        product: productToArchive
-      });
+      return res.status(200).send(productToArchive);
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -159,10 +150,7 @@ export async function archiveProduct(req, res) {
       { new: true }
     );
 
-    return res.status(200).json({
-      message: 'Product is successfully archived!',
-      product: updatedProduct
-    });
+    return res.status(200).send(updatedProduct);
   } catch (error) {
     console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -183,10 +171,7 @@ export async function activateProduct(req, res) {
     }
 
     if (productToActivate.isActive === true) {
-      return res.status(200).json({
-        message: 'Product is already activated',
-        product: productToActivate
-      });
+      return res.status(200).send(productToActivate);
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -195,10 +180,7 @@ export async function activateProduct(req, res) {
       { new: true }
     );
 
-    return res.status(200).json({
-      message: 'Product is successfully activated!',
-      product: updatedProduct
-    });
+    return res.status(200).send(updatedProduct)
   } catch (error) {
     console.error(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -225,7 +207,7 @@ export async function searchProducts(req, res){
         }
 
         const products = await Product.find(query);
-        res.status(200).json(products);
+        res.status(200).send(products);
     } catch (error) {
         console.error('Error in searching products:', error);
         res.status(500).send('Internal Server Error');

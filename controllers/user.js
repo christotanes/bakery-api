@@ -37,10 +37,7 @@ export async function registerUser(req, res) {
     try {
         const savedUser = await newUser.save();
 
-        return res.status(201).json({
-            message: 'User was successfully registered!',
-            user: savedUser,
-        });
+        return res.status(201).send(savedUser);
     } catch (saveError) {
         if (saveError.name === 'MongoError' && saveError.code === 11000) {
         // Unique constraint violation (duplicate email)
@@ -114,10 +111,7 @@ export async function updateProfile(req, res) {
             });
         } else {
         userProfile.password = "";
-        return res.status(200).json({
-            message: "User profile successfully updated",
-            userProfile: userProfile
-        });
+        return res.status(200).send(userProfile);
     }
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -153,7 +147,7 @@ export async function changePassword(req, res) {
         user.password = bcrypt.hashSync(req.body.newPassword, 10);
         await user.save();
 
-        return res.status(200).json({ message: 'Password successfully changed' });
+        return res.status(200).send(true);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -172,10 +166,7 @@ export async function getUserOrders(req, res) {
             });
         };
 
-        return res.status(200).json({
-            message: "These are the user's past orders",
-            orders: userOrders
-        });
+        return res.status(200).send(userOrders);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -195,10 +186,7 @@ export async function setAsAdmin(req, res) {
         };
 
         if (userToAdmin.isAdmin === true) {
-            return res.status(200).json({
-                message: 'User is already an admin',
-                user: userToAdmin
-            });
+            return res.status(200).send(userToAdmin);
         };
 
         const setUserAdmin = await User.findByIdAndUpdate(
@@ -206,10 +194,7 @@ export async function setAsAdmin(req, res) {
             { isAdmin: true}, 
             {new: true});
 
-        return res.status(200).json({
-            message: 'User has been set as an admin',
-            user: setUserAdmin
-        });
+        return res.status(200).send(setUserAdmin);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');

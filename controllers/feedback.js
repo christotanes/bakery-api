@@ -14,10 +14,7 @@ export async function getFeedback(req, res) {
             });
         };
 
-        return res.status(200).json({
-            message: "This is the feedback of the user",
-            feedback: feedback
-        });
+        return res.status(200).send(feedback);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -51,10 +48,7 @@ export async function addFeedback(req, res) {
         });
         
         await newFeedback.save();
-        return res.status(200).json({
-            message: "Feedback has been successfully added, we will get back to you!",
-            feedback: newFeedback
-        });
+        return res.status(200).send(newFeedback);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -75,10 +69,7 @@ export async function editFeedback(req, res) {
         };
         feedback.message = message
         await feedback.save();
-        return res.status(200).json({
-            message: "Feedback has been successfully edited, we will get back to you",
-            feedback: feedback
-        });
+        return res.status(200).send(feedback);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -99,10 +90,7 @@ export async function showFeedback(req, res) {
         };
         feedback.showFeedback = showFeedback;
         await feedback.save();
-        return res.status(200).json({
-            message: "You have successfully updated the status of the feedback",
-            feedback: feedback
-        });
+        return res.status(200).send(feedback);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
@@ -120,10 +108,7 @@ export async function getAllFeedback(req, res) {
                 message: "There are no feedbacks by any user yet"
             });
         };
-        return res.status(200).json({
-            message: "These are all the feedbacks",
-            feedback: allFeedback
-        });
+        return res.status(200).send(allFeedback);
     } catch (error) {
         console.error(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
