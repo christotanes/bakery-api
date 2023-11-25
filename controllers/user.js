@@ -135,16 +135,16 @@ export async function changePassword(req, res) {
             });
         };
 
-        const checkNewPassword = bcrypt.compareSync(req.body.newPassword, user.password);
+        const checkNewPassword = bcrypt.compareSync(req.body.password, user.password);
         if (checkNewPassword) {
             return res.status(401).json({ message: 'Please select a new password'});
         };
 
-        if (req.body.newPassword !== req.body.confirmPassword) {
+        if (req.body.password !== req.body.confirmPassword) {
             return res.status(401).json({ message: 'Your new password and confirm password do not match'});
         };
 
-        user.password = bcrypt.hashSync(req.body.newPassword, 10);
+        user.password = bcrypt.hashSync(req.body.password, 10);
         await user.save();
 
         return res.status(200).send(true);
