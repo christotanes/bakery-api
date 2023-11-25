@@ -8,11 +8,12 @@ import orderRoute from './routes/order.js';
 import cartRoute from './routes/cart.js';
 import feedbackRoute from './routes/feedback.js';
 import reviewRoute from './routes/review.js'
+import 'dotenv/config'
 
 const app = express();
 const port = 4002;
 
-mongoose.connect("mongodb+srv://admin:admin@zuitt-bootcamp.3qeebta.mongodb.net/bakerycapstone?retryWrites=true&w=majority");
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_DATABASE}/${process.env.MONGO_COLLECTION}`);
 
 // Will check connection
 let db = mongoose.connection;
