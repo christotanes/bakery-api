@@ -11,7 +11,7 @@ import reviewRoute from './routes/review.js'
 import 'dotenv/config'
 
 const app = express();
-const port = 4002;
+const port = `${process.env.MONGO_PORT}`;
 
 mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_DATABASE}/${process.env.MONGO_COLLECTION}`);
 
