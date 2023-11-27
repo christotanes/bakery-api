@@ -26,12 +26,12 @@ app.use(express.json());
 app.use(cors());
 
 // app.use('/', productRoute);
-app.use('/b2/users', userRoute);
-app.use('/b2/products', productRoute);
-app.use('/b2/orders', orderRoute);
-app.use('/b2/cart', cartRoute);
-app.use('/b2/feedbacks', feedbackRoute);
-app.use('/b2/reviews', reviewRoute);
+app.use('/users', userRoute);
+app.use('/products', productRoute);
+app.use('/orders', orderRoute);
+app.use('/cart', cartRoute);
+app.use('/feedbacks', feedbackRoute);
+app.use('/reviews', reviewRoute);
 
 // Listen to the port
 app.listen(port, () => {
