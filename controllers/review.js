@@ -18,7 +18,7 @@ export async function getAllProductReviews(req,res) {
         if (allReviews.reviews.length === 0) {
             return res.status(204).send(false);
         };
-    
+        
         return res.status(200).send(allReviews.reviews);
     } catch (error) {
         console.error(`Error: ${error}`);

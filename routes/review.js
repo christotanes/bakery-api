@@ -5,7 +5,7 @@ import { verify, verifyAdmin } from '../auth.js';
 
 const router = express.Router();
 
-router.get('/', verify, verifyAdmin, getAllReviews);
+router.get('/', getAllReviews);
 
 router.route('/:productId')
         .get(verify, verifyAdmin, getAllProductReviews)
