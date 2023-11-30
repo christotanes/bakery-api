@@ -5,10 +5,10 @@ import { verify, verifyAdmin } from '../auth.js';
 
 const router = express.Router();
 
-router.get('/', getAllReviews);
+router.get('/', verify, verifyAdmin, getAllReviews);
 
 router.route('/:productId')
-        .get(verify, verifyAdmin, getAllProductReviews)
+        .get(getAllProductReviews)
         .post(verify, userAddReview)
         .put(verify, userEditReview)
         .patch(verify, verifyAdmin, reviewRating)
