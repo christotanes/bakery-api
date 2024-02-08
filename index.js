@@ -1,6 +1,5 @@
 import express from 'express';
 import mongoose from 'mongoose';
-// import axios from 'axios';
 import cors from 'cors';
 import productRoute from './routes/product.js';
 import userRoute from './routes/user.js';
@@ -37,8 +36,5 @@ app.use('/reviews', reviewRoute);
 app.listen(port, () => {
     console.log(`API is now online on port ${port}`);
 });
-
-
-// app.listen(port, () => console.log(`Server running at port ${port}`))
 
 export {app, mongoose};

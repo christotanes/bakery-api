@@ -1,11 +1,9 @@
-console.log("Hello world from controllers/cart.js");
 import Cart from "../models/Cart.js";
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
 
 // [SECTION - CART - ADDGOAL] User retrieves/views cart
 export async function viewCart(req, res) {
-    console.log('This is viewCart function')
     try {
         const userCart = await Cart.findOne({ userId: req.user.id });
         if (!userCart) {
@@ -28,7 +26,6 @@ export async function viewCart(req, res) {
 
 // [SECTION - STRETCH - CART] Add to cart
 export async function addProductToCart(req, res) {
-    console.log('This is addProductToCart function')
     const { productId, name, price, quantity, img, imgLqip } = req.body;
     const newProduct = {
         productId,
@@ -83,7 +80,6 @@ export async function addProductToCart(req, res) {
 
 // [SECTION - STRETCH - CART] Change product quantities and CAN REMOVE PRODUCTS just have to set input button when user clicks remove set Quantity in req.body.quantity to be 0
 export async function editCart(req, res) {
-    console.log('This is editCart function')
     try {
         const userCart = await Cart.findOne({ userId: req.user.id });
         if (!userCart) {
@@ -136,7 +132,6 @@ export async function editCart(req, res) {
 
 // [SECTION] User checkout with Cart added
 export async function userCheckout(req, res) {
-    console.log('This is userCheckout function')
     try {
     // Find user
         let userCart = await Cart.findOne({ userId: req.user.id });

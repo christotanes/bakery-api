@@ -1,9 +1,7 @@
-console.log("Hello world from controllers/product.js");
 import Product from '../models/Product.js';
 
 // [SECTION] Get All Products
 export async function getAllProducts(req, res) {
-  console.log('This is getAllProducts function');
   try {
     const allProducts = await Product.find({});
 
@@ -23,8 +21,6 @@ export async function getAllProducts(req, res) {
 
 // [SECTION - ADMIN] Create Product
 export async function createProduct (req, res){
-    console.log('This is createProduct function');
-    console.log(req.body)
     try {
         const productExists = await Product.findOne({ name: req.body.name });
         if (productExists) {
@@ -64,7 +60,6 @@ export async function createProduct (req, res){
 
 // [SECTION] Retrieve all ACTIVE products
 export async function activeProducts(req, res){
-  console.log('This is activeProducts function');
   try{
     const activeProducts = await Product.find({ isActive: true});
 
@@ -84,8 +79,6 @@ export async function activeProducts(req, res){
 
 // [SECTION] Retrieve a SINGLE product
 export async function getProductById(req, res){
-  console.log('This is getProductById function');
-  console.log(req.params);
   try{
     const singleProduct = await Product.findById(req.params.productId)
     // console.log(`singleProduct value: ${singleProduct}`)
@@ -107,7 +100,6 @@ export async function getProductById(req, res){
 
 // [SECTION - ADMIN] Update Product
 export async function updateProduct(req, res) {
-  console.log('This is updateProduct function');
   const { productId, isActive, ...updates } = req.body;
 
   try {
@@ -129,7 +121,6 @@ export async function updateProduct(req, res) {
 
 // [SECTION - ADMIN] Archive Product
 export async function archiveProduct(req, res) {
-  console.log('This is archiveProduct function');
   try {
     const productToArchive = await Product.findById(req.params.productId);
 
@@ -152,14 +143,12 @@ export async function archiveProduct(req, res) {
 
     return res.status(200).send(updatedProduct);
   } catch (error) {
-    console.log(`Error: ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 }
 
 // [SECTION - ADMIN] Activate Product
 export async function activateProduct(req, res) {
-  console.log('This is activateProduct function');
   try {
     const productToActivate = await Product.findById(req.params.productId);
 
@@ -189,7 +178,6 @@ export async function activateProduct(req, res) {
 
 // Search
 export async function searchProducts(req, res){
-    console.log('This is the searchProducts function');
     try {
         const query = {};
 

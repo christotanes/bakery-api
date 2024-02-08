@@ -1,4 +1,3 @@
-console.log("Hello world from routes/product.js");
 import express from 'express';
 import { getAllProducts, createProduct, activeProducts, getProductById, updateProduct, archiveProduct, activateProduct, searchProducts } from '../controllers/product.js';
 import { verify, verifyAdmin } from '../auth.js';

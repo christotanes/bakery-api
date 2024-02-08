@@ -1,4 +1,3 @@
-console.log("Hello world from routes/review.js");
 import express from 'express';
 import { getAllReviews, getAllProductReviews, userAddReview, userEditReview, reviewRating } from '../controllers/review.js';
 import { verify, verifyAdmin } from '../auth.js';

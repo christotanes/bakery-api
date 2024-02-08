@@ -1,4 +1,3 @@
-console.log("Hello world from routes/order.js");
 import express from 'express';
 import { getOrderById, updateOrder, getAllOrders } from '../controllers/order.js';
 import { verify, verifyAdmin } from '../auth.js';

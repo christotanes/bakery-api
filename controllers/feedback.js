@@ -1,10 +1,8 @@
-console.log("Hello world from controllers/feedback.js");
 import Feedback from "../models/Feedback.js";
 import Order from "../models/Order.js";
 
 // [SECTION - FEEDBACK - STRETCH] User retrieves feedback
 export async function getFeedback(req, res) {
-    console.log('This is the getFeedback function');
     try {
         const feedback = await Feedback.find({ userId: req.user.id });
         if (!feedback) {
@@ -23,7 +21,6 @@ export async function getFeedback(req, res) {
 
 // [SECTION - FEEDBACK - STRETCH] User adds/posts feedback
 export async function addFeedback(req, res) {
-    console.log('This is the addFeedback function');
     const { message } = req.body
     try {
         const feedback = await Feedback.findOne({ userId: req.user.id });
@@ -57,7 +54,6 @@ export async function addFeedback(req, res) {
 
 // [SECTION - FEEDBACK - STRETCH] User edits feedback
 export async function editFeedback(req, res) {
-    console.log('This is the editFeedback function');
     const { message, id } = req.body
     try {
         const feedback = await Feedback.findOne({ userId: req.user.id });
@@ -78,7 +74,6 @@ export async function editFeedback(req, res) {
 
 // [SECTION - FEEDBACK - STRETCH] Admin sets feedback to be shown on testimonials
 export async function showFeedback(req, res) {
-    console.log('This is the showFeedback function');
     const { _id, showFeedback } = req.body
     try {
         const feedback = await Feedback.findById(_id);
@@ -99,7 +94,6 @@ export async function showFeedback(req, res) {
 
 // [SECTION - FEEDBACK - STRETCH] Admin gets all feedback from all users
 export async function getAllFeedback(req, res) {
-    console.log('This is the getAllFeedback function');
     try {
         const allFeedback = await Feedback.find({});
         if (allFeedback.length === 0) {

@@ -1,4 +1,3 @@
-console.log("Hello world from routes/user.js");
 import express from 'express';
 import { getAllUsers, registerUser, login, getProfile, updateProfile, changePassword, getUserOrders, setAsAdmin } from '../controllers/user.js';
 import {verify, verifyAdmin} from '../auth.js'
@@ -19,17 +18,4 @@ router.route("/:id")
     .put(verify, updateProfile)
     .patch(verify, changePassword);
 
-
-
 export default router
-
-// [SECTION] Dependencies & Modules
-// const express = require('express');
-// const functionName = require('../controllers/controller');
-// // [SECTION] Routing Component
-// const router = express.Router();
-
-// const auth = require("../auth");
-// const { verify, verifyAdmin } = auth;
-// // [SECTION] Expert Route System
-// module.exports = router;

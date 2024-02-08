@@ -1,4 +1,3 @@
-console.log("Hello world from routes/feedback.js");
 import express from 'express';
 import { getFeedback, addFeedback, editFeedback, showFeedback, getAllFeedback } from '../controllers/feedback.js';
 import { verify, verifyAdmin } from '../auth.js';

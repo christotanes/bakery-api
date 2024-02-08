@@ -1,4 +1,3 @@
-console.log("Hello world from models/Feedback.js");
 import { mongoose } from "mongoose";
 
 // JSON schema for (placeholder = TaskSchema)

@@ -1,4 +1,3 @@
-console.log("Hello world from controllers/user.js");
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import Order from '../models/Order.js';
@@ -8,7 +7,6 @@ import { createAccessToken } from '../auth.js';
 
 // [SECTION] Admin GETS all users
 export async function getAllUsers (req, res){
-    console.log('This is getAllUsers function');
     try{
         const allUsers = await User.find({}, { password: 0 });
         if(allUsers == null){
@@ -21,14 +19,12 @@ export async function getAllUsers (req, res){
         return res.status(200).send(allUsers);   
 
     } catch (error) {
-        console.log(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
     }
 };
 
 // [SECTION] Register New User
 export async function registerUser(req, res) {
-    console.log(`This is registerUser function`);
     const newUser = new User({
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 10),
@@ -53,10 +49,8 @@ export async function registerUser(req, res) {
 
 // [SECTION] User Logins
 export async function login(req, res){
-    console.log('This is login function')
     try{
         const user = await User.findOne({ email: req.body.email});
-        // console.log(user)
         if(!user){
             return res.status(404).json({error: 'There is no account registered under this email'});
         } else {
@@ -69,14 +63,12 @@ export async function login(req, res){
             }
         }
     } catch (error) {
-        console.log(`Error: ${error}`);
         return res.status(500).send('Internal Server Error');
     }
 }
 
 // [SECTION] User retrieves profile details
 export async function getProfile(req, res){
-    console.log('This is getprofile function')
     try {
         const userProfile = await User.findById(req.user.id, {password: 0})
         if (!userProfile) {
@@ -96,7 +88,6 @@ export async function getProfile(req, res){
 
 // [SECTION - NOT INCLUDED] User updates profile
 export async function updateProfile(req, res) {
-    console.log('This is updateProfile function')
     if (req.params.id !== req.user.id) {
         return res.status(401).json({error: 'Unauthorized - Incorrect token'});
     };
@@ -121,7 +112,6 @@ export async function updateProfile(req, res) {
 
 // [SECTION - ADDGOAL] Change password
 export async function changePassword(req, res) {
-    console.log('This is changePassword function')
     if (req.params.id !== req.user.id) {
         return res.status(401).json({ error: 'Unauthorized - Incorrect token' });
     };
@@ -156,7 +146,6 @@ export async function changePassword(req, res) {
 
 // [SECTION - STRETCH] Retrieve user's orders
 export async function getUserOrders(req, res) {
-    console.log('This is getUserOrders function')
     try {
         const userOrders = await Order.find({userId: req.user.id});
         if (!userOrders) {
@@ -175,7 +164,6 @@ export async function getUserOrders(req, res) {
 
 // [SECTION - ADMIN - STRETCH] Set User as Admin
 export async function setAsAdmin(req, res) {
-    console.log('This is setAsAdmin function')
     try {
         const userToAdmin = await User.findById(req.params.id);
         if (!userToAdmin) {

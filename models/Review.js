@@ -1,4 +1,3 @@
-console.log("Hello world from models/Review.js");
 import { mongoose } from "mongoose";
 
 // JSON schema for Review

@@ -1,11 +1,9 @@
-console.log("Hello world from controllers/review.js");
 import Review from "../models/Review.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 
 // [SECTION - STRECTH - Ratings] Admin gets ProductId's Specific Reviews
 export async function getAllProductReviews(req,res) {
-    console.log('This is getAllProductReviews function');
     try {
         const allReviews = await Review.findOne({productId: req.params.productId})
         if (!allReviews) {
@@ -28,7 +26,6 @@ export async function getAllProductReviews(req,res) {
 
 // [SECTION - STRECTH - Ratings] User adds review
 export async function userAddReview(req,res) {
-    console.log('This is userAddReview function');
     let userReview = {
         userId: req.user.id,
         rating: req.body.rating,
@@ -91,7 +88,6 @@ export async function userAddReview(req,res) {
 
   // [SECTION - STRECTH - Ratings] User edit's review
 export async function userEditReview(req,res) {
-    console.log('This is userEditReview function');
     const { userId, showReview, rating, message } = req.body;
     try {
         const review = await Review.findOne({productId: req.params.productId})
@@ -103,10 +99,8 @@ export async function userEditReview(req,res) {
         };
 
         const userIdReviewIndex = review.reviews.findIndex(review => review.userId === req.user.id);
-        console.log('User review found at index:', userIdReviewIndex);
 
         if (userIdReviewIndex === -1) {
-            console.log('No user review found');
             return res.status(204).send(false);
         };
 
@@ -125,7 +119,6 @@ export async function userEditReview(req,res) {
 
   // [SECTION - STRECTH - Ratings] Admin reviews rating and sets showReview to true
 export async function reviewRating(req,res) {
-    console.log('This is reviewRating function');
     const { userId, showReview } = req.body
     try {
         const review = await Review.findOne({productId: req.params.productId})
@@ -137,10 +130,8 @@ export async function reviewRating(req,res) {
         };
 
         const userIdReviewIndex = review.reviews.findIndex(review => review.userId === userId);
-        console.log('User review found at index:', userIdReviewIndex);
 
         if (userIdReviewIndex === -1) {
-        console.log('No user review found');
         return res.status(204).send(false);
         };
 
@@ -158,7 +149,6 @@ export async function reviewRating(req,res) {
 
 // [SECTION - STRECTH - Ratings] Admin GETS ALL PRODUCTS REVIEWS
 export async function getAllReviews(req,res) {
-    console.log('This is getAllReviews function');
     try {
         const allReviews = await Review.find({})
     
