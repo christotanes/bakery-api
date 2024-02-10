@@ -1,6 +1,6 @@
 # Capstone 2 Bakery API using Node, Express and MongoDB for Zuitt
 
-### [API link on AWS ec2 as provided by Zuitt](http://ec2-54-254-9-166.ap-southeast-1.compute.amazonaws.com:4010/products/active)
+### [API link on personal AWS EC2](http://ec2-54-254-9-166.ap-southeast-1.compute.amazonaws.com:4010/products/active)
 
 This is my Capstone 2 project that was made as a requirement for Back end course on Zuitt.
 
